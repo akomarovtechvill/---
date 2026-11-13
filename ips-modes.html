@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Режимы пиццемата IPLAYSMART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>/* Схема-лист: шапка с навигацией, панель управления, диаграмма во всю ширину, карточка выделения, справочные разделы */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --fg:#171b21; --muted:#596271; --line:#cdd3dc; --comp:#eceff3; --sel:#e6eaf0;
+  --ok:#2e8049; --ok-bg:#e1f1e6;
+  --part:#a86e14; --part-bg:#f8edd4;
+  --pause:#3a66b8; --pause-bg:#e3ebfa;
+  --off:#b0413f; --off-bg:#f6e2e1;
+  --none:#768090; --none-bg:#e7eaee;
+  --danger:#c2362f;
+  --font-body:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111317; --surface:#191c21; --fg:#e6e9ed; --muted:#9aa3af; --line:#343a44; --comp:#15181c; --sel:#232830;
+    --ok:#5fbf80; --ok-bg:#15291c; --part:#e0a64a; --part-bg:#32260e; --pause:#80a7ee; --pause-bg:#172239;
+    --off:#e2797a; --off-bg:#361b1c; --none:#9aa3b0; --none-bg:#22262d; --danger:#ef6b63;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111317; --surface:#191c21; --fg:#e6e9ed; --muted:#9aa3af; --line:#343a44; --comp:#15181c; --sel:#232830;
+  --ok:#5fbf80; --ok-bg:#15291c; --part:#e0a64a; --part-bg:#32260e; --pause:#80a7ee; --pause-bg:#172239;
+  --off:#e2797a; --off-bg:#361b1c; --none:#9aa3b0; --none-bg:#22262d; --danger:#ef6b63;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1300px;margin:0 auto;padding-inline:20px;padding-block:32px 56px;display:grid;gap:20px}
+.eyebrow{font:500 12px/1.4 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(26px,3.4vw,36px);line-height:1.15;font-weight:700;letter-spacing:-.01em;margin:6px 0 10px;text-wrap:balance}
+.lead{max-width:72ch;margin:0;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font:500 13px var(--font-mono)}
+.toc{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:16px}
+.toc a{font:500 13px var(--font-body);color:var(--fg);text-decoration:none;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.toc a:hover{background:var(--sel)}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;scroll-margin-top:16px}
+.group{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-width:0}
+.glabel,.d-cols h4,.kv dt,th{font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface)}
+.seg button{font:500 13.5px var(--font-body);padding:6px 12px;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.seg button:focus-visible,.reset:focus-visible,.tlink:focus-visible,.goto:focus-visible,.toc a:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sw{width:12px;height:12px;border-radius:3px;border:1.5px solid;display:inline-block}
+.lg line{stroke:var(--fg);stroke-width:1.6}
+.lg .dash{stroke-dasharray:6 4}
+.lg .dot{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+.lg .danger{stroke:var(--danger);stroke-dasharray:6 4}
+.reset{font:500 13px var(--font-body);padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);cursor:pointer}
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.scroll{overflow-x:auto}
+#sm{display:block;width:100%;min-width:980px;height:auto;color:var(--fg)}
+figcaption{padding:10px 16px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+#sm text{font-family:var(--font-body)}
+#sm .node rect{stroke-width:1.6}
+#sm .nid{font:500 11px var(--font-mono);fill:var(--muted);text-anchor:middle}
+#sm .nname{font-size:13.5px;font-weight:600;fill:var(--fg);text-anchor:middle}
+#sm .nstat{font-size:11px;font-weight:500;fill:var(--muted);text-anchor:middle}
+#sm .atitle{font-size:11.5px;font-weight:600;fill:var(--fg)}
+#sm .aval{font-size:11px;fill:var(--muted)}
+#sm .divl{stroke:var(--line);stroke-width:1}
+#sm .comp rect{fill:var(--comp);stroke:var(--line);stroke-width:1.3}
+#sm .ctitle{font-size:12.5px;font-weight:600;fill:var(--muted)}
+#sm .grp{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}
+#sm .pseudo rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}
+#sm .pseudo text{font-size:12px;fill:var(--muted);text-anchor:middle}
+#sm .tr path{fill:none;stroke-linejoin:round}
+#sm .tr path.halo{stroke:var(--surface);stroke-width:5}
+#sm .tr path.ln{stroke:var(--fg);stroke-width:1.5}
+#sm .tr.auto path.ln,#sm .tr.safety path.ln{stroke-dasharray:6 4}
+#sm .tr.remote path.ln{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+#sm .tr.safety path.ln{stroke:var(--danger)}
+#sm .tr path.hit{stroke:transparent;stroke-width:14}
+#sm .junc{fill:var(--fg)}
+#sm .badge circle{fill:var(--surface);stroke:var(--fg);stroke-width:1.3}
+#sm .tr.safety .badge circle{stroke:var(--danger)}
+#sm .badge text{font:600 10.5px var(--font-mono);fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+#sm .mk-fg{fill:var(--fg)}
+#sm .mk-danger{fill:var(--danger)}
+#sm .node,#sm .badge,#sm .pseudo,#sm .tr{cursor:pointer}
+#sm .node:focus,#sm .badge:focus,#sm .pseudo:focus{outline:none}
+#sm .node:focus-visible rect{stroke-width:3.2}
+#sm .badge:focus-visible circle{stroke-width:2.8}
+#sm .node,#sm .tr,#sm .pseudo,#sm .grp{transition:opacity .15s}
+#sm.has-sel .node:not(.on),#sm.has-sel .tr:not(.on),#sm.has-sel .pseudo:not(.on){opacity:.15}
+#sm.has-sel .comp:not(.on){opacity:.5}
+#sm .tr.on path.ln{stroke-width:2.6}
+#sm .tr.on .badge circle{stroke-width:2.2}
+#sm .node.cur rect{stroke-width:3.2}
+
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:14px;min-width:0}
+.detail .hint{margin:0;color:var(--muted)}
+.d-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.d-id{font:600 13px var(--font-mono);color:var(--muted)}
+.d-head h3{margin:0;font-size:20px;line-height:1.25;font-weight:700;text-wrap:balance}
+.d-desc{margin:0;max-width:75ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:var(--bg);max-width:100%}
+.chip b{font-weight:500;color:var(--muted);white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:7px}
+.st i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.d-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px 28px}
+.d-cols h4{margin:0 0 6px}
+.d-cols ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.tlink{display:grid;grid-template-columns:34px 1fr;gap:0 10px;width:100%;text-align:left;padding:6px 8px;border:0;border-radius:6px;background:transparent;color:var(--fg);font:inherit;cursor:pointer}
+.tlink:hover{background:var(--sel)}
+.tn{grid-row:span 2;font:600 11px var(--font-mono);display:inline-grid;place-items:center;width:28px;height:28px;border:1.3px solid var(--fg);border-radius:50%;align-self:start}
+.tlink.safety .tn{border-color:var(--danger)}
+.tlink span:not(.tn){font-size:14px;font-weight:500}
+.tlink small{font-size:13px;color:var(--muted)}
+.empty,.note{font-size:13.5px;color:var(--muted)}
+.note{margin:0;max-width:85ch}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 18px;margin:0}
+.kv dt{line-height:1.9}
+.kv dd{margin:0}
+.goto{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:500 13px var(--font-body);cursor:pointer}
+.goto:hover{background:var(--sel)}
+.goto code{font:600 12px var(--font-mono);color:var(--muted)}
+.rc{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px}
+.rc i{font-style:normal;color:var(--muted)}
+
+.sec{display:grid;gap:10px;scroll-margin-top:16px;min-width:0}
+.sec h2{font-size:18px;font-weight:700;margin:8px 0 0}
+.sec h3{font-size:14.5px;font-weight:600;margin:6px 0 0}
+.sec p{margin:0;max-width:80ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 20px;display:grid;gap:10px;min-width:0}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 32px}
+.plain,.steps{margin:0;padding-left:20px;display:grid;gap:4px}
+.tscroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;min-width:820px;border-collapse:collapse;font-size:14px}
+table.wide{min-width:1120px}
+th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr[data-s],tbody tr[data-t]{cursor:pointer}
+tbody tr[data-s]:hover td,tbody tr[data-t]:hover td,tbody tr.sel td{background:var(--sel)}
+tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--fg)}
+tbody tr:focus-visible{outline:2px solid var(--fg);outline-offset:-2px}
+td.id{font:500 13px var(--font-mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.sub td.id{padding-left:28px;color:var(--muted)}
+tr.parent td:nth-child(2){font-weight:600}
+td.path{white-space:nowrap;font-weight:500}
+table.matrix{min-width:1080px}
+.matrix th.m{text-align:center;white-space:normal;min-width:96px}
+.matrix th.m small{display:block;font:400 11px var(--font-body);letter-spacing:0;text-transform:none;color:var(--muted)}
+.matrix td.c{text-align:center;vertical-align:middle;padding:6px}
+.cell{display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-width:62px;padding:4px 6px;border-radius:6px;font-size:12.5px;font-weight:600;line-height:1.25}
+.cell small{font-weight:400;font-size:11px;max-width:112px}
+.c-y{background:var(--ok-bg);color:var(--ok)}
+.c-c{background:var(--part-bg);color:var(--part)}
+.c-n{color:var(--muted);font-weight:500}
+.c-u{border:1px dashed var(--muted);color:var(--muted);font-weight:500}
+td.cmd{font-weight:600;min-width:200px}
+td.cmd small{display:block;font:500 11.5px var(--font-mono);color:var(--muted);margin-top:3px}
+td.cmd span{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+.mlegend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px;color:var(--muted)}
+footer{font-size:13px;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion: reduce){#sm .node,#sm .tr,#sm .pseudo,#sm .grp{transition:none}}
+:root{--shadow:0 10px 30px rgba(20,24,31,.16)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--shadow:0 10px 30px rgba(0,0,0,.55)}}
+:root[data-theme="dark"]{--shadow:0 10px 30px rgba(0,0,0,.55)}
+#tm{min-width:1340px}
+.ref{font:500 .9em var(--font-mono);color:inherit;background:none;border:0;border-bottom:1px dotted currentColor;padding:0;margin:0;cursor:pointer;line-height:inherit}
+.ref:hover{color:var(--pause)}
+.ref:focus-visible,.rc-x:focus-visible,#sm .fl:focus-visible rect{outline:2px solid var(--fg);outline-offset:2px}
+.refcard{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:10;max-width:640px;margin-inline:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;display:grid;gap:8px;max-height:55vh;overflow:auto}
+.rc-head{display:flex;align-items:baseline;gap:10px}
+.rc-head code{font:600 13px var(--font-mono)}
+.rc-head span{font-size:12.5px;color:var(--muted);flex:1;min-width:0}
+.rc-x{border:0;background:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.refcard p{margin:0;font-size:14px}
+.rc-st{font-size:12.5px;color:var(--muted)}
+tr.x td{color:var(--muted)}
+tr.x td:not(:first-child){font-style:italic}
+.dchip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.d-ok{background:var(--ok-bg);color:var(--ok)}
+.d-none{background:var(--none-bg);color:var(--none)}
+.d-part{background:var(--part-bg);color:var(--part)}
+.d-pause{background:var(--pause-bg);color:var(--pause)}
+.steps li,.plain li{max-width:85ch}
+.detail ol{margin:0;padding-left:20px;display:grid;gap:3px}
+#sm .fbox{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+#sm .fl rect{fill:var(--bg);stroke:var(--muted);stroke-width:1}
+#sm .fl text{font-size:11.5px;fill:var(--fg)}
+#sm .fl{cursor:pointer;transition:opacity .15s}
+#sm .fl:focus{outline:none}
+#sm .fl.cur rect{stroke:var(--fg);stroke-width:2}
+#sm.has-sel .fl:not(.on){opacity:.35}
+@media (prefers-reduced-motion: reduce){#sm .fl{transition:none}}
+[hidden]{display:none!important}
+.wrap{max-width:1480px;gap:16px}
+header .lead{max-width:80ch}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.wrap > *{min-width:0}
+.ctl{display:inline-flex;align-items:center;gap:8px;max-width:100%;min-width:0;font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ctl select{min-width:0;flex:0 1 auto;font:500 14px var(--font-body);letter-spacing:0;text-transform:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:100%}
+.ctl select:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:12px;min-width:0;align-content:start}
+@media (min-width:1200px){
+  .main{grid-template-columns:minmax(0,1fr) 340px}
+  .side{position:sticky;top:calc(12px + env(safe-area-inset-top, 0px));max-height:calc(100vh - 24px);overflow:auto}
+}
+.side h3{margin:0;font-size:18px;line-height:1.25;font-weight:700;text-wrap:balance}
+.side p{margin:0}
+.side ul,.side ol{margin:0;padding-left:18px;display:grid;gap:5px}
+.side .kv{grid-template-columns:minmax(0,1fr);gap:2px 0}
+.side .kv dt{line-height:1.4;margin-top:8px}
+.side .kv dd{font-size:14px}
+.side .d-cols{grid-template-columns:minmax(0,1fr)}
+.crumb{font:500 12px var(--font-mono);color:var(--muted)}
+.back{justify-self:start;font:500 13px var(--font-body);padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+.nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nav button{font:500 13.5px var(--font-body);padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+.nav button.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.nav button:disabled{opacity:.4;cursor:default}
+.nav .step{font:500 12px var(--font-mono);color:var(--muted);margin-left:auto}
+.back:focus-visible,.nav button:focus-visible,.tabs button:focus-visible,.refblock summary:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.attrs{display:grid;gap:6px;margin:0;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:13.5px}
+.attrs b{font-weight:600}
+.lgline{display:grid;grid-template-columns:34px 1fr;gap:6px 10px;align-items:center;font-size:13.5px;color:var(--muted)}
+.lgline svg line{stroke:var(--fg);stroke-width:1.6}
+.lgline .cyc{stroke-width:3}
+.lgline .thin{stroke:var(--muted);stroke-width:1.4}
+.lgline .dash{stroke-dasharray:6 4}
+.lgline .dot{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+.lgline .danger{stroke:var(--danger);stroke-dasharray:6 4}
+#legend:empty{display:none}
+
+#sm{min-width:900px}
+@media (min-width:1200px){#sm{min-width:0}}
+#sm .nid{font-size:12px}
+#sm .nname{font-size:15px}
+#sm .nstat{font-size:12px}
+#sm .ctitle{font-size:13.5px}
+#sm .badge text{font-size:11.5px}
+#sm.v-ov #g-dt{display:none}
+#sm.v-dt #g-ov{display:none}
+#sm:not(.l-safety) #g-flags{display:none}
+#sm.l-none .node.atom rect{fill:var(--surface);stroke:var(--fg);stroke-width:1.4}
+#sm.v-ov.l-none .node.sub rect{fill:transparent;stroke:var(--muted);stroke-dasharray:4 3;stroke-width:1.2}
+#sm.v-ov.l-none .node.sub text{fill:var(--muted)}
+#sm .ag path{fill:none;stroke-linejoin:round}
+#sm .ag path.halo{stroke:var(--surface);stroke-width:6}
+#sm .ag path.ln{stroke:var(--muted);stroke-width:1.4}
+#sm .ag.cycle path.ln{stroke:var(--fg);stroke-width:2.8}
+#sm .ag.safety path.ln{stroke:var(--danger);stroke-dasharray:6 4}
+#sm .ag.remote path.ln{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+#sm .ag path.hit{stroke:transparent;stroke-width:16}
+#sm .ag{cursor:pointer;transition:opacity .15s}
+#sm .ag:focus{outline:none}
+#sm .ag:focus-visible path.ln{stroke-width:4}
+#sm .pill rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
+#sm .pill text{font:600 11.5px var(--font-mono);fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+#sm .mk-muted{fill:var(--muted)}
+#sm.has-sel .ag:not(.on){opacity:.15}
+#sm .ag.on path.ln{stroke-width:3.2}
+#sm.has-sel .tr.trail{opacity:.5}
+#sm.has-sel .node.trail{opacity:.65}
+@media (prefers-reduced-motion: reduce){#sm .ag{transition:none}}
+
+.refblock{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 18px}
+.refblock summary{cursor:pointer;padding:14px 0;font-weight:700;font-size:16px}
+.refblock summary span{font-weight:400;font-size:13.5px;color:var(--muted);margin-left:8px}
+.refblock[open]{padding-bottom:18px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{font:500 13.5px var(--font-body);padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tabp{display:grid;gap:10px;min-width:0}
+.pillsample{justify-self:start;font:600 11.5px var(--font-mono);color:var(--muted);border:1.2px solid var(--muted);border-radius:10px;padding:0 7px;line-height:18px}
+.rsec{display:grid;gap:10px;min-width:0}
+.rsec + .rsec{margin-top:10px}
+.rsec h3{margin:4px 0 0;font-size:16px;font-weight:700}
+.card p{margin:0;max-width:85ch}
+.dg{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;font-size:11.5px;font-weight:600;line-height:18px;background:var(--off-bg);color:var(--off);white-space:nowrap}
+table.matrix{min-width:1220px}
+td.dz{font-size:13px;min-width:150px}
+.side h4{margin:6px 0 0;font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+.side .chips{gap:6px}
+.pnav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.pnav a,.pnav span{font:500 13px var(--font-body);padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;background:var(--surface)}
+.pnav span{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.pnav a:hover{background:var(--sel)}
+
+#sm .tr.lock path.ln{stroke:var(--danger);stroke-dasharray:6 4}
+#sm .tr.lock .badge circle{stroke:var(--danger)}
+#sm .node.comp rect{fill:var(--comp);stroke:var(--line)}
+#sm .node.comp.on rect{stroke:var(--muted)}
+#sm .junc{fill:var(--fg)}
+.scheme-only header,.scheme-only .controls,.scheme-only .side,.scheme-only .refblock,.scheme-only footer{display:none}
+.scheme-only .wrap{padding:0;max-width:none}
+.scheme-only .main{display:block}
+.scheme-only figure.diagram{border:0;border-radius:0}
+.scheme-only #sm{min-width:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IPLAYSMART · Концепция эксплуатации · модель режимов, черновик</div>
+    <h1>Режимы работы пиццемата</h1>
+    <p class="lead">Модель для обсуждения. Нажмите на режим, чтобы раскрыть его переходы, на номер — чтобы увидеть условия перехода, или выберите сценарий и пройдите его по шагам.</p>  </header>
+
+  <div class="controls">
+    <label class="ctl" for="layer">Слой
+      <select id="layer">
+        <option value="none">Без слоя</option>
+        <option value="hub">Статус для хаба</option>
+        <option value="plat">Статус платформы</option>
+        <option value="time">Учет времени</option>
+        <option value="motion">Механика и нагрев</option>
+      </select>
+    </label>
+    <label class="ctl" for="scen">Сценарий
+      <select id="scen"><option value="">Не выбран</option></select>
+    </label>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="main">
+    <figure class="diagram" id="fig">
+      <div class="scroll">
+        <svg id="sm" viewBox="0 0 1300 800" role="group" aria-label="Схема режимов пиццемата: режимы, подрежимы и переходы"></svg>
+      </div>
+    </figure>
+    <aside class="side" id="card" aria-live="polite"></aside>
+  </div>
+
+  <details class="refblock" id="ref">
+    <summary>Справочник модели<span>принципы, режимы, переходы, причины отказа, отказы, команды, заказ, параметры, решения, вопросы</span></summary>
+    <div class="tabs" role="tablist" aria-label="Разделы справочника" id="tabs"></div>
+    <div id="tabps"></div>
+  </details>
+
+  <footer>Панель построена из той же модели, что и документ «IPS_ Концепция эксплуатации» (model/ips-model.js). Факты — по агенту 2.2.25, ЧТЗ v1.1, ICD-IPSM rev01 и документам изготовителя. Пометка «Требует обсуждения» означает предложение, не утвержденное владельцем продукта.</footer>
+</div>
+<script>
+const M = {"meta":{"title":"Концепция эксплуатации","object":"вендинговый аппарат разогрева пиццы IPLAYSMART","code":"ConOps-IPSM","org":"ООО «Кибершеф». Москва, 2026","rev":"00","date":"03.11.2026","status":"Черновик","basis":"Агент шлюза 2.2.25 на обоих аппаратах, Android-приложение изготовителя 1.1.66"},"intro":{"background":["Пиццемат IPLAYSMART (вендинговый аппарат разогрева пиццы 5-го поколения, изготовитель Guangzhou iPlaySmart Technology) продает замороженную пиццу, разогревает ее и выдает покупателю в окно выдачи. Аппарат работает в Контуре зоны кафетерия магазина «ВкусВилл»: заказ и оплата проходят на кассе самообслуживания (КСО) Контура, хаб интеграции передает аппарату оплаченный заказ.","Аппарат — покупное готовое изделие. Штатное Android-приложение изготовителя (Aiwan, com.aiwan.automat) управляет платой готовки и связано с облаком изготовителя. Интегратор встроил в приложение шлюз (агент): локальный REST-интерфейс для хаба, локальный MQTT для подрядчика хаба и канал в систему мониторинга RB Monitoring. Механику, нагрев и холодильник аппарата интегратор не меняет.","Документ описывает эксплуатацию аппарата в Контуре: режимы, роли, переходы, сценарии штатной и нештатной работы. Устройство шлюза и форматы обмена описаны в ICD-IPSM и ЧТЗ интеграции, документ ссылается на них и не повторяет их.","Описано состояние на пилоте (две точки) и целевое решение. Отличия этапов приведены в приложении Г. Положения с пометкой «Требует обсуждения» — предложения, они не подтверждены владельцем продукта."],"kpi":[["Показатель","Значение"],["Пропускная способность","Ограничена одной печью: пиццы готовятся по одной. Время цикла задает программа разогрева товара (по продукт-листу этапа 1 — 260 °C, 130 с) плюс перемещения. Целевое значение не определено"],["Коэффициент эксплуатационной готовности","Не определено. Измеряется по времени в M-02 с открытым приемом в часы работы точки (раздел 2.4, приложение Е.2)"],["Доля заказов без итога","Цель — ноль заказов в статусе «ожидание» дольше 15 мин. Обеспечено агентом с 2.2.20 (приложение Е.6)"],["Время реакции на блокировку","Не определено. Защелку печи снимает человек после осмотра (раздел 2.4)"],["Конфигурация","Единая для всех точек: одна сборка APK с агентом, один формат обмена с хабом"]],"assumptions":["Аппарат стоит в торговом зале с поддерживаемым климатом. Изготовитель допускает установку внутри и снаружи помещения, без дождя и прямого солнца, с зазором не менее 30 см за задней стенкой для отвода тепла.","Магазин дает электропитание 220 В с заземлением (номинальная мощность по руководству — 8,7 кВт), сетевое подключение (Ethernet или LTE-модем) и место для пополнения.","Оплата и фискализация выполняются в Контуре на КСО. Хаб передает аппарату только оплаченные заказы. Возврат денег по невыданной позиции выполняет Контур по итогу, который сообщил аппарат.","Пиццы поступают замороженными в коробках 12″ и хранятся в холодильной камере аппарата в ячейках, сгруппированных по видам. Пополняет и отмечает ячейки сотрудник магазина.","Аппарат и КСО находятся в одном сегменте локальной сети точки. Хаб обращается к аппарату по LAN, без облака изготовителя.","Мониторинг ведет диспетчер в RB Monitoring. Удаленный доступ инженера — через ADB-туннель через VPS интегратора.","Ремонт механики, печи и холодильника выполняет сервисный инженер. Запасные части — по перечню изнашиваемых деталей изготовителя."],"limits":["Кнопки аварийного останова нет. Чтобы остановить аппарат немедленно, его обесточивают (акт приемки от 30.07.2026).","Датчика «пицца в печи» нет. После невыданной позиции аппарат не знает, осталась ли пицца в камере, поэтому ставит защелку печи до осмотра человеком.","Датчиков улицы, испарителя и влажности нет. Аппарат сообщает только температуру холодильной камеры и печи.","Вход в сервисное меню защищен служебным кодом изготовителя. Персонал и инженер программно не различаются.","Плата готовки управляется только через приложение изготовителя по последовательному порту. Интегратор не меняет прошивку платы и форматы JSON подрядчика хаба.","Второй вход в облако изготовителя от имени аппарата запрещен: он вытесняет сессию аппарата."],"modules":[["Узел","Назначение"],["Холодильная камера","Хранение замороженной пиццы в ячейках (на экране пополнения — 01…67), группы ячеек по видам пиццы. Режимы охлаждения или заморозки, оттаивание по таймеру, УФ-обеззараживание"],["Тележка и лоток ячеек","Извлекают коробку из ячейки и через дверцу холодильника подают ее в печь"],["Печь","Разогрев: нагревательные элементы, СВЧ или оба способа. Поддон с подъемом, вилка, поворотный стол. Программа разогрева задается на товар"],["Окно выдачи","Автоматическая дверь с фотоэлементом защиты от прищемления"],["Компьютер аппарата","Android 7.1.2 (rk3288), сенсорный экран, приложение изготовителя с агентом интегратора, Termux (локальный брокер MQTT, ADB-туннель)"],["Плата готовки","Управляет механикой и нагревом, отвечает на опрос статуса и сообщает температуры"]],"customer":["Покупатель выбирает пиццу на КСО, оплачивает заказ (СБП, банковская карта, приложение ВкусВилл), получает чек и номер заказа.","Хаб передает аппарату оплаченный заказ (POST /v1/vend). Аппарат принимает заказ и ставит позиции в очередь платы.","Плата извлекает коробку из ячейки, разогревает пиццу и выдает ее в окно. На КСО покупатель видит «Заказ готов».","Покупатель забирает пиццу из окна выдачи. Кнопка «Следующий заказ» на КСО освобождает кассу.","Если позиция не выдана, аппарат сообщает итог «не выдан» с причиной. Возврат денег выполняет Контур."],"externals":[["Внешняя система","Взаимодействие с аппаратом"],["Хаб интеграции Контура (через КСО)","Передает оплаченные заказы (REST :8787), получает перечень ячеек и остатки, итоги позиций, хартбит и ошибки (MQTT :1883). Интерфейс IF-27, документ ICD-IPSM"],["RB Monitoring (диспетчеризация)","Получает статус аппарата, температуры, фазы заказов и ошибки по MQTTS с клиентским сертификатом. Передает команды: опрос, остатки, перезагрузка, ADB-туннель, обновление агента"],["Облако изготовителя Aiwan","Учет заказов и ячеек изготовителя. Обмен ведет только приложение аппарата. Хаб и диспетчер к облаку не обращаются"],["Репозиторий релизов агента","Источник пакета обновления (OTA) агента"],["VPS интегратора","Обратный ADB-туннель для удаленной диагностики и установки"],["Инженерная инфраструктура магазина","Электропитание, сеть, размещение"]]},"needs":[["Заинтересованная сторона","Ожидание от аппарата"],["Бизнес","Продажа горячей пиццы без персонала у аппарата, предсказуемая выручка"],["Покупатель","Горячая пицца за несколько минут после оплаты. Если пицца не выдана — честный итог и возврат денег"],["Сотрудник магазина","Пополнение по понятной инструкции за несколько минут, без инженерной квалификации"],["Диспетчер","Видеть, доступен ли аппарат и почему нет, получать события о невыдаче и блокировках, восстанавливать работу удаленно, где это безопасно"],["Подрядчик хаба","Стабильный контракт REST и MQTT, однозначный итог каждой позиции"],["Сервисный инженер","Диагностика по журналам и дампам обмена с платой без выезда, ремонт механики на месте"],["Интегратор (разработчик агента)","Обновление агента удаленно, без потери настроек и сертификатов, с откатом через ADB"]],"functions":[["Функция","Что делает аппарат"],["Прием заказов","Принимает от хаба оплаченный заказ, проверяет готовность и остаток, ставит позиции в очередь платы. Отказывает с причиной (409, 503), если принять нельзя"],["Хранение","Держит пиццу в холодильной камере, ведет остатки ячеек по отметкам персонала, останавливает продажу при превышении температуры"],["Приготовление и выдача","Подает коробку в печь, разогревает по программе товара, выдает в окно"],["Учет итога","Ведет журнал заказов, сообщает итог каждой позиции: выдан, частично, не выдан, не подтвержден"],["Защита от повторной готовки","Ставит защелку печи после невыданной позиции, пока человек не проверит камеру"],["Самовосстановление","Перезапускает приложение, если плата не приняла задачу готовки, и передает дело инженеру при повторе"],["Мониторинг","Публикует хартбит, температуры, фазы заказов и ошибки на платформу и в локальный MQTT"],["Удаленное обслуживание","Выполняет команды платформы из белого списка, принимает обновление агента, открывает ADB-туннель"]],"roles":[["Роль","Что делает с аппаратом"],["Покупатель","Оплачивает заказ на КСО, забирает пиццу из окна выдачи"],["Сотрудник магазина","Пополняет ячейки и отмечает их в сервисном меню. По вызову диспетчера осматривает печь и окно выдачи, извлекает оставшуюся пиццу, сообщает «камера пуста». Не пользуется тестовым окном"],["Диспетчер","Следит за аппаратами в RB Monitoring, отдает удаленные команды, снимает защелку печи после подтверждения человека на месте, вызывает инженера"],["Сервисный инженер","ТО, ремонт и наладка на месте: тестовое окно, позиционирование ячеек, программы разогрева, устранение замятий"],["Инженер-интегратор","Выпускает агент, диагностирует по журналам и дампам удаленно, устанавливает APK"],["Технолог","Задает товар, время и температуру разогрева. С аппаратом напрямую не работает"],["Изготовитель","Гарантия и поддержка механики, печи, холодильника и приложения"]],"hmi":[["Кто","Средство","Назначение"],["Покупатель","КСО Контура","Выбор, оплата, номер заказа, «Заказ готов»"],["Покупатель","Окно выдачи","Получение пиццы"],["Покупатель","Экран аппарата","Состояние аппарата и выдачи. Продажа с экрана аппарата в Контуре не используется"],["Сотрудник, инженер","Ключ дверей аппарата","Доступ к холодильной камере и узлам"],["Сотрудник, инженер","Сервисное меню (служебный код)","Отметка ячеек, сброс ошибок, журнал отказов, пауза, перезапуск. Тестовое окно — только инженер"],["Диспетчер","RB Monitoring","Статус, температуры, события, команды"],["Инженер-интегратор","ADB-туннель, локальный REST","Журналы, дампы, снятие защелки, установка APK"]],"principles":["Режим выделяется, если он отличается от соседних хотя бы одним из пяти признаков и это отличие можно проверить: прием заказов, механика и нагрев, кто внутри аппарата, статус для хаба, учет времени.","Подрежим наследует свойства режима и добавляет свои. Подрежимы одного режима взаимоисключающие.","Типовой день проходит так: M-02 → M-03.1 → M-02. Аппарат включен круглосуточно, потому что холодильная камера хранит товар. Работа вне часов точки требует обсуждения (В-01).","Готовность к заказу определяется одним правилом Readiness: плата отвечала на опрос не более 30 с назад, статус платы не 7, защелки печи нет. То же значение получают хаб (/health, iplaysmart/status) и платформа.","В RB Monitoring признак online означает живую сессию MQTTS, а не готовность. Готовность смотрят в /health. Два «онлайна» не смешивают.","Защелка печи снимается только после того, как человек на месте подтвердил, что камера пуста. Перезапуск, перезагрузка и обновление защелку не снимают.","Пока открыто сервисное меню, приложение закрывает порт платы. Сервисное меню и тестовое окно не открывают, пока в очереди есть заказ.","Заказ не висит без итога: позиция без событий платы закрывается по таймауту с причиной (приложение Е.6).","Агент не готовит пиццу сам. Готовка начинается только по оплаченному заказу хаба или по команде инженера в тестовом окне.","Опасные удаленные команды выполняются только при пустой очереди и только из режима, указанного в приложении Е.5."],"modes":[{"id":"OFF","disp":"—","name":"Выключен","purpose":"Монтаж, перевозка, пропадание сети, остановка вместо аварийного останова","accept":"Нет","motion":"Обесточены. Холодильная камера не охлаждает","person":"По процедуре","hub":"Нет связи: соединение с :8787 отклонено или таймаут","plat":"online:false по Will","time":"В часы работы точки — организационный простой, иначе не учитывается"},{"id":"M-01","disp":"M-01","name":"Запуск","purpose":"Загрузка Android, автозапуск брокера и туннеля, старт приложения и агента, выход на главный экран, возобновление опроса платы, прогрев печи","accept":"Нет","motion":"Самопроверка изготовителя, прогрев печи","person":"Никого","hub":"Нет связи, затем /health online:false","plat":"online:false до сессии MQTTS","time":"Как у режима, из которого выполнен вход"},{"id":"M-02","disp":"M-02","name":"Рабочий","purpose":"Прием, разогрев и выдача пиццы","accept":"Да, если нет причин П1","motion":"Автоматически по заказу","person":"Никого, двери закрыты","hub":"/health online:true или 409 с причиной","plat":"online:true, фазы заказов","time":"Рабочее время, при причинах П1 — по причине"},{"id":"M-03","disp":"M-03","name":"Обслуживание персоналом","purpose":"Работы сотрудника магазина через дверь и сервисное меню"},{"id":"M-03.1","disp":"M-03.1","name":"Пополнение","purpose":"Загрузка коробок в ячейки, отметка ячеек и сохранение по видам, проверка сроков, уборка","accept":"Нет","motion":"Опрос платы прерван сервисным меню","person":"Сотрудник магазина","hub":"online:false через 30 с после закрытия порта","plat":"online:true (сессия жива)","time":"Плановый простой"},{"id":"M-03.2","disp":"M-03.2","name":"Вмешательство персонала","purpose":"Осмотр печи и окна выдачи, извлечение оставшейся пиццы, сброс ошибок по указанию диспетчера","accept":"Нет","motion":"Опрос платы прерван сервисным меню","person":"Сотрудник магазина","hub":"online:false","plat":"online:true","time":"Внеплановый простой"},{"id":"M-04","disp":"M-04","name":"Инженерный","purpose":"Работы сервисного инженера на месте"},{"id":"M-04.1","disp":"M-04.1","name":"Плановое ТО","purpose":"ТО по регламенту изготовителя: чистка, проверка механики, печи, холодильника","accept":"Нет","motion":"Ручное управление из тестового окна","person":"Сервисный инженер","hub":"online:false","plat":"online:true","time":"Плановый простой"},{"id":"M-04.2","disp":"M-04.2","name":"Ремонт","purpose":"Устранение отказа: замятие коробки, мотор, датчик, печь, холодильник","accept":"Нет","motion":"Ручное управление из тестового окна","person":"Сервисный инженер","hub":"online:false","plat":"online:true","time":"Внеплановый простой"},{"id":"M-04.3","disp":"M-04.3","name":"Наладка","purpose":"Пусконаладка, позиционирование ячеек, программы разогрева, установка APK на месте, перемещение, вывод из эксплуатации","accept":"Нет","motion":"Ручное управление из тестового окна","person":"Сервисный инженер, интегратор","hub":"online:false","plat":"online:true","time":"Плановый простой"},{"id":"M-05","disp":"M-05","name":"Блокировка продаж","purpose":"Аппарат включен, на главном экране, но заказы не принимает"},{"id":"M-05.1","disp":"M-05.1","name":"Приостановка","purpose":"Статус платы 7 («использование приостановлено»), превышение температуры холодильной камеры, пауза из сервисного меню. Снимается автоматически или с экрана","accept":"Нет, 409","motion":"Готовка не начинается, охлаждение работает","person":"Никого","hub":"online:false, событие machine_blocked","plat":"online:true, событие блокировки","time":"Внеплановый простой, пауза — по причине"},{"id":"M-05.2","disp":"M-05.2","name":"Защелка","purpose":"После невыданной позиции в камере может остаться пицца, либо плата повторно не принимает задачи готовки. Снимается только после проверки человеком","accept":"Нет, 409","motion":"Новая готовка запрещена","person":"Никого до осмотра","hub":"online:false, oven_blocked:true с причиной и заказом","plat":"online:true, блокирующее событие","time":"Внеплановый простой"}],"flags":[{"id":"ready","name":"Готовность (Readiness)","set":"Плата ответила на опрос не более 30 с назад, статус платы не 7, защелки нет","clear":"Нарушено любое условие","act":"Определяет online в /health и iplaysmart/status. /v1/vend при online:false отвечает 409","t":[2,6,9,12]},{"id":"latch","name":"Защелка печи","set":"Позиция «не выдан» (пицца могла остаться в камере), повторный отказ платы в течение часа после перезапуска, процесс не перезапустился за 90 с","clear":"POST /v1/oven/clear после подтверждения человека на месте, что камера пуста. Успешная выдача","act":"Хранится в файле, переживает перезапуск и обновление. Запрещает новую готовку. Событие oven_blocked на платформу","t":[3,10,11,12]},{"id":"restart","name":"Перезапуск после отказа платы","set":"Плата не подтвердила задачу готовки за 45 с (первый раз)","clear":"Новый процесс приложения","act":"/v1/vend отвечает 409 «повторите через минуту», очередь не отправляется, приложение перезапускается не чаще раза в час","t":[4]},{"id":"plat","name":"Сессия платформы","set":"Установлена сессия MQTTS с RB Monitoring","clear":"60 с без входящих пакетов, обрыв сети","act":"Без сессии удаленные команды не доходят, события фаз заказа теряются (очереди платформы нет)","t":[]}],"attrs02":[["Признак","Значения","Правила"],["П1 Прием","Перечень активных причин отказа в приеме. Пустой перечень — прием открыт","Причины и учет времени — в приложении Е.2. Причина снимается сама при устранении"],["П2 Исполнение","Простой (0), Готовит (1), Нужно подтверждение (2) — статус платы","Пока плата не в простое или в очереди есть позиции, сервисное меню, тестовое окно, перезагрузку и обновление не выполняют"],["П3 Состав меню","Ячейки с остатком больше нуля и включенным каналом","Остаток уменьшается при выдаче и задается отметкой ячеек или POST /v1/stock. Хаб опрашивает /v1/channels раз в 5 мин"]],"trans":[{"n":1,"from":["OFF"],"to":["M-01"],"fromL":"Выключен","toL":"M-01","kind":"human","who":"Сотрудник или инженер на месте; автоматически при возврате сети","cond":"Подано питание","act":"Загрузка Android, автозапуск брокера MQTT и ADB-туннеля, запуск приложения и агента"},{"n":2,"from":["M-01"],"to":["M-02"],"fromL":"M-01","toL":"M-02","kind":"auto","who":"Автоматически","cond":"Главный экран продаж на переднем плане, плата отвечает на опрос, статус платы не 7, защелки нет","act":"/health online:true, хартбит iplaysmart/status, статус на платформу"},{"n":3,"from":["M-01"],"to":["M-05"],"fromL":"M-01","toL":"M-05","kind":"lock","who":"Автоматически","cond":"При старте действует защелка печи из файла или плата сообщает статус 7","act":"Отказ в приеме, /health oven_blocked:true или machine_blocked"},{"n":4,"from":["M-02","M-05"],"to":["M-01"],"fromL":"M-02, M-05","toL":"M-01","kind":"remote","who":"Автоматически: первый отказ платы принять задачу, падение процесса. Диспетчер удаленно: перезагрузка, обновление агента","cond":"Для команд диспетчера — очередь пуста, П2 = «Простой». Авто-перезапуск — не чаще раза в час","act":"Позиции, не начатые до перезапуска, закрываются через 60 с после старта с причиной «автомат перезапускался». Начатые — через 15 мин как неподтвержденные"},{"n":5,"from":["M-02"],"to":["M-03.1"],"fromL":"M-02","toL":"M-03.1","kind":"human","who":"Сотрудник, ключ и сервисное меню","cond":"Очередь пуста, П2 = «Простой». Сейчас проверяется только организационно","act":"Сервисное меню закрывает порт платы, через 30 с /health online:false"},{"n":6,"from":["M-03"],"to":["M-02"],"fromL":"M-03","toL":"M-02","kind":"human","who":"Сотрудник, выход из меню «Назад»","cond":"Ячейки отмечены и сохранены по видам, двери закрыты, защелки нет","act":"Главный экран, опрос платы возобновлен. Если защелка не снята, аппарат остается в M-05.2"},{"n":7,"from":["M-02"],"to":["M-03.2"],"fromL":"M-02","toL":"M-03.2","kind":"human","who":"Сотрудник по вызову диспетчера","cond":"Ошибка платы, пицца не забрана или застряла в окне выдачи. Очередь пуста","act":"Как T-05"},{"n":8,"from":["M-02"],"to":["M-05.1"],"fromL":"M-02","toL":"M-05.1","kind":"lock","who":"Автоматически; сотрудник — пауза","cond":"Статус платы 7, температура камеры выше порога отключения, кнопка «Пауза» в сервисном меню","act":"409 на /v1/vend, событие machine_blocked (blocking:true)"},{"n":9,"from":["M-05.1"],"to":["M-02"],"fromL":"M-05.1","toL":"M-02","kind":"auto","who":"Автоматически; сотрудник — снятие паузы с экрана","cond":"Статус 7 снят (авто-сброс с 2.2.7), температура вернулась в норму за время восстановления, пауза снята","act":"Событие machine_unblocked, прием открыт"},{"n":10,"from":["M-02"],"to":["M-05.2"],"fromL":"M-02","toL":"M-05.2","kind":"lock","who":"Автоматически","cond":"Позиция «не выдан» (плата вернула ошибку, пицца могла остаться в камере); повторный отказ платы в течение часа после авто-перезапуска; процесс жив через 90 с после отказа","act":"Защелка в файле, 409 «нужна проверка печи» или «нужен техник», событие oven_blocked или блокирующее board_no_ack на платформу"},{"n":11,"from":["M-05.2"],"to":["M-03.2"],"fromL":"M-05.2","toL":"M-03.2","kind":"human","who":"Сотрудник или инженер на месте по вызову диспетчера","cond":"—","act":"Защелка сохраняется до T-12"},{"n":12,"from":["M-05.2"],"to":["M-02"],"fromL":"M-05.2","toL":"M-02","kind":"remote","who":"Диспетчер или интегратор удаленно, POST /v1/oven/clear","cond":"Человек на месте подтвердил: камера печи пуста, окно выдачи свободно, причина отказа платы устранена","act":"Событие oven_cleared на платформу, прием открыт"},{"n":13,"from":["M-03","M-05"],"to":["M-04"],"fromL":"M-03, M-05","toL":"M-04","kind":"human","who":"Сервисный инженер на месте","cond":"Вызов диспетчера, замятие, отказ механизма, повторная защелка","act":"Инженер работает из сервисного меню и тестового окна"},{"n":14,"from":["M-02"],"to":["M-04"],"fromL":"M-02","toL":"M-04","kind":"human","who":"Сервисный инженер на месте","cond":"Очередь пуста, П2 = «Простой». Плановое ТО — по графику","act":"Как T-05"},{"n":15,"from":["M-04"],"to":["M-04"],"fromL":"M-04.x","toL":"M-04.y","kind":"human","who":"Сервисный инженер","cond":"—","act":"—"},{"n":16,"from":["M-04"],"to":["M-02"],"fromL":"M-04","toL":"M-02","kind":"human","who":"Сервисный инженер, выход из меню","cond":"После ремонта, замены узла или позиционирования выполнен тестовый цикл. Двери закрыты, защелка снята","act":"Как T-06"},{"n":17,"from":["M-04"],"to":["M-01"],"fromL":"M-04","toL":"M-01","kind":"human","who":"Сервисный инженер или интегратор","cond":"Перезапуск приложения, установка APK, перезагрузка","act":"Как T-04. После установки проверить запуск агента и /health"},{"n":18,"from":["*"],"to":["OFF"],"fromL":"Любой","toL":"Выключен","kind":"auto","who":"Автоматически при пропадании сети; человек на месте — выключение, в том числе вместо аварийного останова","cond":"Для штатного выключения — очередь пуста, окно выдачи свободно","act":"Очередь платы в памяти теряется. При возврате сети — T-01"}],"reasons":[["Причина","Возникает","Снимается","Ответ /v1/vend","Учет времени"],["Нет остатка в ячейке","Остаток канала 0 или канал выключен","Пополнение и отметка ячейки, POST /v1/stock","409 по позиции","Организационный простой, если пусты все ячейки"],["Предыдущий заказ еще передается","Предыдущий /v1/vend не передан в очередь (до 30 с)","Окончание передачи","503","Рабочее время"],["Перезапуск после отказа платы","Плата не подтвердила задачу 45 с","Новый процесс","409 «повторите через минуту»","Внеплановый простой"],["Плата не отвечает","Нет ответа на опрос 30 с","Ответ платы","409","Внеплановый простой, в M-03 и M-04 — по режиму"],["Статус платы 7","Плата сообщила «использование приостановлено»","Авто-сброс, сброс ошибок","409","Внеплановый простой (M-05.1)"],["Температура камеры выше порога","Функция изготовителя «температура автоотключения»","Возврат температуры за время восстановления","409","Внеплановый простой (M-05.1)"],["Пауза","Кнопка в сервисном меню","Снятие паузы с экрана","409","Требует обсуждения: плановый или организационный"],["Защелка печи","T-10","T-12","409 с причиной","Внеплановый простой (M-05.2)"],["Нет связи хаба с аппаратом","Сбой LAN, падение приложения","Восстановление связи","Таймаут","Организационный простой, при падении приложения — внеплановый"],["Вне часов работы точки","График точки","Начало графика","Требует обсуждения (В-01)","Не учитывается"]],"reasonsNote":"Правило старшинства: при нескольких причинах время учитывается по старшей категории — внеплановый, затем организационный, затем плановый простой. Без причин — рабочее время. Категории учета предложены по образцу РТК и требуют утверждения.","failures":{"intro":"Отказ, требующий инженера, — состояние, которое сотрудник магазина и диспетчер не устраняют удаленно или без инструмента. К таким отказам относятся:","items":["замятие коробки (обычно при загрузке не язычком вперед) — аппарат стоит до приезда инженера,","отказ мотора, концевика или датчика тележки, лотка, двери холодильника, печи или окна выдачи (событие error_raised с кодом платы),","повторный отказ платы принять задачу готовки в течение часа после авто-перезапуска («нужен техник»),","перегрев или недостаточный нагрев печи, задымление,","холодильная камера не держит температуру, обледенение при выключенном оттаивании,","отказ фотоэлемента окна выдачи (дверь не закрывается при ярком свете)."],"note":"Перечень составлен по руководству изготовителя и журналу инцидентов пилота. Классификацию «критический / существенный» требует утвердить владелец продукта (В-07)."},"rcols":["M-01","M-02","M-03","M-04","M-05.1","M-05.2"],"cmds":[{"cmd":"ping","ch":"Платформа","danger":"Нет","cells":{"M-01":["y"],"M-02":["y"],"M-03":["y"],"M-04":["y"],"M-05.1":["y"],"M-05.2":["y"]},"note":"Ответ pong"},{"cmd":"stock / get_stock","ch":"Платформа","danger":"Нет","cells":{"M-02":["y"],"M-03":["y"],"M-04":["y"],"M-05.1":["y"],"M-05.2":["y"]},"note":"Снимок остатков"},{"cmd":"adb_tunnel, adb_restart","ch":"Платформа","danger":"Нет","cells":{"M-01":["y"],"M-02":["y"],"M-03":["y"],"M-04":["y"],"M-05.1":["y"],"M-05.2":["y"]},"note":"Сторож туннеля в Termux, перезапуск adbd"},{"cmd":"reboot / reboot_android","ch":"Платформа","danger":"Да: прерывает готовку","cells":{"M-02":["c","очередь пуста"],"M-05.1":["y"],"M-05.2":["c","защелка сохраняется"]},"note":"Ведет в M-01 по T-04"},{"cmd":"ota / update","ch":"Платформа","danger":"Да: перезапуск приложения","cells":{"M-02":["c","очередь пуста"],"M-05.1":["y"],"M-05.2":["y"]},"note":"Пакет агента, сертификаты и настройки не затираются. Ведет в M-01"},{"cmd":"unlock","ch":"Платформа","danger":"Нет","cells":{},"note":"Замка нет, ответ ok:false"},{"cmd":"POST /v1/vend","ch":"Хаб, LAN","danger":"Да: запускает механику и нагрев","cells":{"M-02":["y"]},"note":"Только оплаченный заказ. 409 при online:false, 503 при незавершенной передаче"},{"cmd":"POST /v1/stock","ch":"Хаб, LAN","danger":"Нет","cells":{"M-02":["y"],"M-03":["y"],"M-04":["y"],"M-05.1":["y"],"M-05.2":["y"]},"note":"Абсолютный остаток. Не заменяет отметку ячеек при пополнении"},{"cmd":"POST /v1/oven/clear","ch":"Интегратор, туннель","danger":"Да: разрешает новую готовку","cells":{"M-05.2":["c","после подтверждения на месте"]},"note":"Снимает защелку (T-12)"},{"cmd":"POST /v1/board/clear","ch":"Интегратор, туннель","danger":"Да: стирает очередь платы","cells":{"M-04":["y"],"M-05.2":["c","очередь проверена"]},"note":"Ручная очистка очереди"},{"cmd":"Второй вход в облако изготовителя","ch":"—","danger":"Запрещено","cells":{},"note":"Вытесняет сессию аппарата"}],"cmdsNote":["Опасная команда — та, после которой без действий человека начинаются движение механизмов или нагрев, либо прерывается начатая готовка, либо снимается защита от повторной готовки.","Команды вне таблицы недопустимы. Возврат в работу из M-03 и M-04 выполняет только человек на месте.","Команды платформы приходят по MQTTS с клиентским сертификатом аппарата. Задержка выполнения (delayMs) — не более 30 с.","Снятие защелки через туннель — решение пилота. В целевом решении предлагается команда платформы oven_clear с обязательным полем «кто подтвердил на месте» (В-05)."],"orderStates":[["Состояние позиции","result_code / result","Определение"],["Принята","1 / pending","Заказ принят /v1/vend или кнопкой бесплатного заказа на экране, на платформу ушло order_accepted"],["Готовится","1 / pending, local_state 1","Плата начала готовку штуки. В MQTT подрядчика не публикуется, на платформу — фаза dispensing"],["Выдана","2 / dispensed","Плата сообщила об успехе, экран «заберите». Конечное"],["Частично выдана","3 / partial","Выдана часть штук позиции. Конечное"],["Не выдана","4 / failed","Ошибка платы, отказ до подтверждения, плата не приняла задачу, таймаут. Причина в result_text. Конечное"],["Не подтверждена","4 / failed, unconfirmed:true","Готовка начиналась, итог не пришел. Нужна ручная проверка выдачи. Конечное"]],"orderTrans":[["№","Из","В","Событие"],["З-01","—","Принята","POST /v1/vend 200, событие iplaysmart/order, order_accepted на платформу"],["З-02","Принята","Готовится","Плата начала готовку (onMaking)"],["З-03","Готовится","Выдана","board_ready, local_state 2"],["З-04","Готовится","Не выдана","board_failed, local_state 3. Ставится защелка печи (T-10)"],["З-05","Принята","Не выдана","shipment_failed (отказ до подтверждения) или board_no_ack (45 с без подтверждения). Пиццы нет"],["З-06","Принята","Не выдана","Через 60 с после старта процесса: «автомат перезапускался до начала готовки»"],["З-07","Принята","Не выдана","15 мин без событий и не в очереди платы: «плата не начала готовку»"],["З-08","Готовится","Не подтверждена","15 мин без итога: «результат не подтвержден — проверьте выдачу», order_expired"],["З-09","Готовится","Частично выдана","Часть штук выдана, остальные закрыты по З-04…З-08"]],"orderNotes":["Конечный статус не меняется: поздний итог от платы после закрытия отбрасывается.","События order_expired и order_error уходят один раз и только для заказов не старше 24 ч. Более старые закрываются без событий.","Хаб считает ответ /v1/vend принятием заказа, а не выдачей. Источник истины по позиции — iplaysmart/order/item, резерв — GET /v1/orders/{id}.","Повторная передача того же заказа хабом опирается на client_order_id и GET /v1/jobs/{client_order_id}. Второй /v1/vend при зависшем первом сразу получает 503 — двойной пиццы нет."],"params":[["Параметр","Значение"],["Порог живости платы","30 с с последнего ответа на опрос"],["Хартбит iplaysmart/status и device_status","30 с"],["Признак падения приложения для хаба","Нет хартбита 60–90 с и нет ответа /health"],["Ожидание подтверждения задачи платой","45 с, повторы кадра через 5 с, до 3 раз"],["Авто-перезапуск приложения","Не чаще раза в час, проверка через 90 с"],["Закрытие позиции без событий","15 мин; не начатые до перезапуска — 60 с после старта"],["Срок отправки событий о закрытии","Заказы не старше 24 ч"],["Ответ /v1/vend","До 30 с (передача в очередь 15 + 15 с)"],["Таймаут хаба на REST по ICD-IPSM","20 с — меньше максимального ответа /v1/vend, требует согласования (В-04)"],["Опрос /v1/channels хабом","5 мин"],["Сессия платформы","keepalive 45 с, связь мертва после 60 с без входящих, переподключение через 3 с"],["Оповещение «аппарат недоступен»","online:false дольше 2 мин"],["Программа разогрева","На товар. Продукт-лист этапа 1: 260 °C, 130 с"],["Порог отключения по температуре камеры, время восстановления","Настройка изготовителя, значения не утверждены (В-06)"],["Оттаивание","Рекомендация изготовителя — каждые 15 мин при температуре ниже −10 °C"],["Дамп обмена с платой","Кольцо 3 мин или 3000 кадров, хранится 30 файлов"],["Очередь публикаций агента","200 сообщений"]],"scen":[{"id":"OS-101","grp":"norm","name":"Ввод в работу после включения","start":"Аппарат выключен, ячейки загружены.","steps":[["Сотрудник или инженер включает питание.","T-1"],["Android загружается, автозапуск поднимает брокер MQTT и ADB-туннель, стартует приложение и агент.","M-01"],["Приложение выходит на главный экран продаж, плата отвечает на опрос, печь прогревается.","M-01"],["Если защелки нет и статус платы не 7, аппарат переходит в M-02: /health online:true, хартбит в iplaysmart/status, статус на платформу.","T-2"],["Если при старте действует защелка, аппарат остается заблокированным (OS-201).","T-3"]],"result":"Аппарат принимает заказы."},{"id":"OS-102","grp":"norm","name":"Покупка пиццы","start":"M-02, прием открыт, в ячейке есть пицца.","steps":[["Покупатель выбирает пиццу на КСО и оплачивает.","M-02"],["Хаб передает заказ POST /v1/vend с client_order_id. Аппарат отвечает 200, все позиции «ожидание». В iplaysmart/order уходит тот же снимок, на платформу — order_accepted.","M-02"],["Плата извлекает коробку, разогревает пиццу по программе товара и выдает в окно.","M-02"],["Аппарат публикует board_ready в iplaysmart/order/item. Хаб показывает на КСО «Заказ готов».","M-02"],["Покупатель забирает пиццу из окна выдачи.","M-02"]],"result":"Позиция выдана, остаток ячейки уменьшен."},{"id":"OS-103","grp":"norm","name":"Заказ из нескольких пицц","start":"M-02, в заказе несколько позиций.","steps":[["Хаб передает один /v1/vend с несколькими позициями.","M-02"],["Печь одна, поэтому плата готовит пиццы по очереди. Итог по каждой позиции приходит отдельным событием.","M-02"],["Если одна позиция не выдана, остальные продолжаются. Хаб показывает частичное исполнение, Контур возвращает деньги за невыданную.","M-02"]],"result":"Каждая позиция имеет конечный итог.","discuss":"Порядок выдачи нескольких пицц из одного окна и сообщение покупателю — требует обсуждения с бизнесом."},{"id":"OS-104","grp":"norm","name":"Пополнение","start":"M-02, мало остатка или плановое время пополнения.","steps":[["Сотрудник убеждается, что аппарат не готовит и очереди нет.","M-02"],["Сотрудник открывает дверь ключом и входит в сервисное меню. Аппарат перестает принимать заказы.","T-5"],["Сотрудник кладет коробки язычком вперед в ячейки своего вида, отмечает ячейки и нажимает «Сохранить» под каждым видом.","M-03.1"],["Сотрудник выходит из меню и закрывает двери.","T-6"],["Аппарат возобновляет опрос платы и прием. Хаб видит новые остатки в /v1/channels не позже чем через 5 мин.","M-02"]],"result":"Ячейки пополнены и отмечены, аппарат в работе."},{"id":"OS-105","grp":"norm","name":"Плановое ТО","start":"Наступил срок ТО по регламенту изготовителя.","steps":[["Инженер дожидается пустой очереди и входит в сервисное меню.","T-14"],["Инженер выполняет работы, при необходимости управляет узлами из тестового окна.","M-04.1"],["После замены узла или позиционирования инженер проводит тестовый цикл.","M-04.1"],["Инженер выходит из меню.","T-16"]],"result":"ТО выполнено, аппарат в работе."},{"id":"OS-106","grp":"norm","name":"Обновление агента","start":"Выпущена новая версия агента.","steps":[["Интегратор выпускает пакет: версия, APK, архив обновления в репозитории релизов.","M-02"],["Диспетчер убеждается, что очередь пуста, и отдает команду ota.","M-02"],["Аппарат скачивает пакет с докачкой, устанавливает APK и перезапускает приложение. Сертификаты и настройки не затираются.","T-4"],["Аппарат проходит запуск и возвращается в M-02. Диспетчер видит новую версию в статусе, интегратор проверяет /health.","T-2"],["Если обновление сорвалось, интегратор ставит APK через ADB-туннель.","M-04.3"]],"result":"Аппарат работает на новой версии агента."},{"id":"OS-201","grp":"fail","name":"Пицца не выдана: защелка печи","start":"M-02, плата вернула ошибку по позиции.","steps":[["Позиция закрывается «не выдан» (board_failed). Пицца могла остаться в камере, датчика нет.","M-02"],["Аппарат ставит защелку печи и перестает принимать заказы. На платформу уходит oven_blocked.","T-10"],["Диспетчер вызывает сотрудника или инженера к аппарату.","M-05.2"],["Человек на месте открывает аппарат, осматривает печь и окно, извлекает пиццу.","T-11"],["Человек подтверждает «камера пуста». Диспетчер или интегратор снимает защелку.","T-12"]],"result":"Камера пуста, прием возобновлен, Контур вернул деньги за позицию."},{"id":"OS-202","grp":"fail","name":"Плата не приняла задачу готовки","start":"M-02, задача готовки отправлена, плата отвечает на опрос, но не подтверждает задачу.","steps":[["Агент повторяет кадр до 3 раз через 5 с. Через 45 с без подтверждения позиция закрывается «не выдан», пиццы нет (board_no_ack).","M-02"],["Аппарат перестает принимать заказы и перезапускает приложение. Дамп обмена с платой сохраняется для разбора.","T-4"],["Новый процесс проходит запуск и принимает заказы.","T-2"],["Если отказ повторился в течение часа, ставится защелка «нужен техник», диспетчер вызывает инженера.","T-10"],["Инженер устраняет причину, защелку снимают.","T-12"]],"result":"Аппарат восстановлен перезапуском или ждет инженера."},{"id":"OS-203","grp":"fail","name":"Заказ без итога","start":"M-02, по позиции нет событий от платы.","steps":[["Если позиция не начата и аппарат перезапускался, через 60 с после старта она закрывается «автомат перезапускался до начала готовки».","M-02"],["Если позиция не начата и не стоит в очереди платы 15 мин — «плата не начала готовку».","M-02"],["Если готовка началась, но итог не пришел 15 мин, позиция закрывается как неподтвержденная, на платформу уходит order_error с unconfirmed.","M-02"],["Хаб передает итог, Контур возвращает деньги. Неподтвержденную позицию проверяют вручную.","M-02"]],"result":"У каждой позиции есть конечный итог.","discuss":"Ставить ли защелку при неподтвержденной позиции — В-08."},{"id":"OS-204","grp":"fail","name":"Блокировка платы (статус 7)","start":"M-02, плата сообщила «использование приостановлено».","steps":[["Аппарат публикует machine_blocked, /v1/vend отвечает 409.","T-8"],["Агент сбрасывает статус 7 автоматически. Если не вышло, сотрудник по указанию диспетчера сбрасывает ошибки в сервисном меню.","M-05.1"],["После снятия статуса аппарат публикует machine_unblocked и принимает заказы.","T-9"]],"result":"Аппарат в работе."},{"id":"OS-205","grp":"fail","name":"Ошибка механизма, замятие коробки","start":"M-02, плата сообщила код ошибки мотора или датчика.","steps":[["Аппарат публикует error_raised с кодом и текстом ошибки. Позиция закрывается «не выдан», ставится защелка.","T-10"],["Диспетчер по коду определяет, нужен ли инженер, и вызывает его.","M-05.2"],["Инженер в сервисном меню устраняет замятие или меняет узел, проверяет узел в тестовом окне.","T-13"],["Инженер снимает защелку и выходит из меню.","T-16"]],"result":"Механизм исправен, аппарат в работе."},{"id":"OS-206","grp":"fail","name":"Нарушение температуры камеры","start":"M-02, температура холодильной камеры выше порога отключения.","steps":[["Аппарат останавливает продажу по функции изготовителя. Температура видна на платформе (freezerTempC).","T-8"],["Если температура вернулась за время восстановления, продажа возобновляется.","T-9"],["Если нет, диспетчер вызывает инженера. Товар с нарушенным хранением сотрудник утилизирует по правилам технолога.","T-13"]],"result":"Товар хранится при заданной температуре.","discuss":"Порог, время восстановления и правило утилизации — В-06."},{"id":"OS-207","grp":"fail","name":"Пропадание сети","start":"Любой режим, пропала сеть 220 В.","steps":[["Аппарат обесточен: печь, механика и холодильник остановлены. ИБП нет.","T-18"],["Очередь платы в памяти теряется. Платформа получает online:false по Will.","OFF"],["При возврате сети аппарат включается сам.","T-1"],["Позиции, не начатые до пропадания, закрываются через 60 с после старта. Начатые — через 15 мин как неподтвержденные.","M-01"],["Аппарат возвращается в M-02 или, если действует защелка, в M-05.2.","T-2"]],"result":"Аппарат в работе, итоги прерванных позиций переданы.","discuss":"Проверка камеры после пропадания сети во время готовки — В-08."},{"id":"OS-208","grp":"fail","name":"Нет связи хаба с аппаратом","start":"M-02, хаб не получает ответ от :8787 и хартбит.","steps":[["Хаб считает аппарат недоступным: нет ответа /health и нет хартбита 60–90 с. Пиццы на КСО не продаются.","M-02"],["Если платформа видит аппарат online, причина в локальной сети или КСО. Если нет — в аппарате или его подключении.","M-02"],["После восстановления хаб сверяет заказы по GET /v1/orders/{id} и /v1/jobs/{client_order_id}.","M-02"]],"result":"Связь восстановлена, итоги заказов сверены."},{"id":"OS-209","grp":"fail","name":"Нет связи с платформой","start":"M-02, сессия MQTTS разорвана, хаб доступен.","steps":[["Аппарат продолжает продавать. Команды платформы и обновления не доходят.","M-02"],["Платформа показывает online:false. Оповещение — если это длится дольше 2 мин.","M-02"],["Агент переподключается каждые 3 с. События фаз заказа за время обрыва теряются (очереди нет).","M-02"]],"result":"Продажи не прерывались, статус на платформе восстановлен."},{"id":"OS-210","grp":"fail","name":"Сервисное меню открыто во время готовки","start":"M-02, плата готовит, сотрудник открыл сервисное меню или тестовое окно.","steps":[["Приложение закрывает и открывает порт платы. Итог текущей позиции может потеряться.","T-5"],["Позиция закрывается по таймауту как неподтвержденная или «не выдан» с защелкой.","M-03.1"],["Диспетчер проверяет выдачу и, при защелке, ведет по OS-201.","M-05.2"]],"result":"Итог позиции известен, камера проверена.","discuss":"Агент не запрещает открыть меню во время готовки. Нужен запрет или предупреждение на экране — В-09."},{"id":"OS-211","grp":"fail","name":"Пицца не забрана из окна выдачи","start":"M-02, позиция выдана, покупатель не забрал пиццу.","steps":[["Поведение аппарата при незабранной пицце и при следующем заказе не описано изготовителем.","M-02"],["Предлагается: диспетчер по событию вызывает сотрудника, сотрудник извлекает пиццу по T-07.","T-7"]],"result":"Окно выдачи свободно.","discuss":"Требует обсуждения: таймаут, сообщение покупателю, судьба пиццы (В-03)."}],"escalation":["Звукового вызова сотрудника у аппарата нет. Все события идут диспетчеру через RB Monitoring и подрядчику хаба через iplaysmart/error.","Блокирующие события: oven_blocked, board_no_ack с блокировкой, machine_blocked, отсутствие online дольше 2 мин. Диспетчер вызывает сотрудника магазина или инженера по матрице эскалации (приложение Д).","Неблокирующие события: error_raised без блокировки, order_expired, unconfirmed. Диспетчер разбирает их в рабочем порядке."],"physical":["Аппарат устанавливается в торговом зале на ровном полу, с зазором не менее 30 см за задней стенкой.","Питание 220 В с заземлением, номинальная мощность 8,7 кВт по руководству изготовителя. Есть электрическая схема трехфазного исполнения — исполнение для точек уточнить (В-10).","Сеть: Ethernet в сегмент точки (для хаба) и выход в интернет (для платформы). Wi-Fi аппарата — только 2,4 ГГц.","Рядом с аппаратом нужно место для коробок при пополнении. Дверь открывается ключом."],"support":["Первая линия — диспетчер: статус, события, перезагрузка, туннель, обновление агента.","Вторая линия — интегратор: журналы ipsm_api, ipsm_platform, ipsm_orders, дампы обмена с платой, снятие защелки, установка APK.","Третья линия — сервисный инженер на месте: механика, печь, холодильник. Время прибытия не определено.","Изготовитель: гарантия, запасные части по перечню изнашиваемых деталей, консультации по механике.","Релизы агента ведутся в репозитории ips-agent. Сборку и установку APK выполняет интегратор только по запросу и при пустой очереди."],"risks":[["№","Риск","Мера"],["Р-01","Обновление приложения изготовителем удалит агент","Обновления изготовителя ставит только интегратор, после проверки на стенде (эмулятор контракта и аппарат лаборатории)"],["Р-02","Служебный код сервисного меню одинаков у всех аппаратов и напечатан в инструкции","Ограничить распространение инструкции, включить пароль настроек изготовителя, рассмотреть разделение кодов персонала и инженера (В-02)"],["Р-03","Общий ключ REST и пароль MQTT для всех аппаратов","Хранить в хранилище секретов, не публиковать в документах, ограничить доступ к сегменту сети"],["Р-04","Нет кнопки аварийного останова","Оценка рисков, доступность автомата питания для сотрудника (В-11)"],["Р-05","Нет датчика пиццы в печи","Защелка печи с проверкой человеком (решение 2)"],["Р-06","Таймаут хаба 20 с меньше ответа /v1/vend до 30 с — хаб повторит заказ, который аппарат уже принял","Согласовать таймаут 35 с и обязательное использование client_order_id (В-04)"],["Р-07","QoS 0 в локальном MQTT, нет очереди событий платформы","Сверка GET /v1/orders/{id}, персистентная очередь платформы в плане агента"],["Р-08","Повторное создание экрана продаж плодит циклы опроса и отправки вендора","VendorGuard с 2.2.25, контроль vendor_shipment_loops = 1 в /health"],["Р-09","Загрузка коробки не той стороной вызывает замятие и простой до инженера","Инструкция пополнения «язычком вперед», обучение сотрудников"]],"decisions":[["№","Решение","Обоснование"],["1","Заказ хаба выполняется локально в приложении аппарата, без облачной удаленной выдачи изготовителя как основного пути","Независимость от облака изготовителя, предсказуемое время приема"],["2","После невыданной позиции ставится защелка печи. Снимается только после подтверждения человеком на месте, что камера пуста. Переживает перезапуск и обновление","Датчика пиццы в печи нет, вторая готовка при пицце в камере опасна"],["3","Первый отказ платы принять задачу — заказ «не выдан» и авто-перезапуск приложения не чаще раза в час. Повтор в течение часа — защелка «нужен техник»","Перезапуск лечит переполнение очереди отправки, систематический отказ требует инженера"],["4","Позиция без итога закрывается по таймауту: 60 с после старта для не начатых до перезапуска, 15 мин для остальных. Начатые без итога — «не подтверждена»","Покупатель и Контур получают итог, возврат не зависает"],["5","Готовность определяется одним правилом Readiness и одинаково отдается хабу и платформе","Один ответ на вопрос «можно ли продать сейчас»"],["6","online платформы — сессия MQTTS, online хаба — готовность. Их не смешивают. Оповещение о недоступности — после 2 мин online:false","Короткие online:false при перезапусках — норма"],["7","При online:false /v1/vend отвечает 409, второй /v1/vend при незавершенном первом — 503","Нет приема заказов, которые аппарат не выполнит, нет двойной пиццы"],["8","Формат JSON подрядчика хаба не меняется, новые поля только добавляются","Совместимость с хабом и КСО"],["9","Обновление агента — удаленно пакетом, только при пустой очереди. Сертификаты и локальные настройки обновлением не затираются","Обновление без выезда, без потери связи с платформой"],["10","Агент не выдумывает датчики: на платформу идут только температуры камеры и печи","Достоверность мониторинга"],["11","Режимы аппарата: Выключен, M-01 Запуск, M-02 Рабочий, M-03 Обслуживание персоналом (M-03.1, M-03.2), M-04 Инженерный (M-04.1, M-04.2, M-04.3), M-05 Блокировка продаж (M-05.1, M-05.2)","Режимы различаются пятью признаками раздела 2.4. Требует утверждения"],["12","Диагностика и установка APK — через ADB-туннель, поднимаемый командой платформы","Аппарат за NAT, локальная сеть точки с офиса не маршрутизируется"]],"esc":{"intro":["Инциденты собираются в платформе мониторинга RB Monitoring и эскалируются диспетчеру-дежурному сервисному инженеру (далее — дежурный). Каждый инцидент дублируется в Тех-бот — группу в Telegram или Max — и задачей в Яндекс Трекер руководителю сервиса.","Дежурный определяет тип инцидента по матрице Д.3, выбирает одно или несколько направлений эскалации и контролирует закрытие инцидента."],"steps":["Аппарат публикует событие или перестает выходить на связь. Платформа мониторинга регистрирует инцидент: аппарат, точку, тип, время и номер заказа, если он есть. Пропадание связи регистрируется, если «health»: false держится дольше 2 мин.","Платформа дублирует инцидент в Тех-бот (группа Telegram или Max) и задачей в Яндекс Трекер руководителю сервиса.","Дежурный принимает инцидент и определяет его тип по матрице Д.3.","Дежурный эскалирует инцидент по одному или нескольким направлениям: СП Тилпос, инженер-интегратор КШ, сотрудник ТТ, выезд сервисного инженера.","Дежурный записывает в инциденте действия, ответы получателей и причину.","Дежурный контролирует закрытие по критериям Д.4 и закрывает инцидент. Тех-бот публикует закрытие."],"sources":[{"id":"dev","name":"Аппарат IPLAYSMART","sub":"события, температуры, «health»"},{"id":"plat","name":"Платформа мониторинга","sub":"RB Monitoring · регистрирует инцидент"},{"id":"bot","name":"Тех-бот","sub":"группа Telegram или Max"},{"id":"yt","name":"Руководитель сервиса","sub":"задача в Яндекс Трекере"},{"id":"duty","name":"Диспетчер-дежурный сервисный инженер","sub":"принимает решение, контролирует закрытие"},{"id":"close","name":"Закрытие инцидента","sub":"критерии Д.4"}],"routes":[{"id":"tilpos","name":"СП Тилпос","sub":"звонок","ch":"Звонок","what":"Проблемы касс: POS-терминал, фискальный регистратор, зависание, интерфейс КСО, СБП и другие платежи","give":"Точка, номер КСО, время, номер чека или заказа, что видит сотрудник"},{"id":"ksh","name":"Инженер-интегратор КШ","sub":"Тех-бот, звонок","ch":"Тех-бот, звонок","what":"Диагностика по журналам и дампам обмена с платой, анализ первопричины, снятие блокировки на пилоте, обновление агента. При причине на стороне хаба привлекает Интегратора-Тилси","give":"Аппарат, время, номер заказа, событие платформы"},{"id":"tt","name":"Сотрудник ТТ","sub":"звонок","ch":"Звонок","what":"Уточнение обстоятельств и дополнительные инструкции: осмотр печи и окна выдачи, извлечение пиццы, сброс ошибок, пополнение, возврат денег покупателю через интерфейс администратора КСО","give":"Что проверить и что сделать, кому сообщить результат"},{"id":"visit","name":"Сервисный инженер","sub":"выезд или назначение","ch":"Выезд дежурного или назначение через руководителя сервиса","what":"Ремонт механики, печи, холодильной камеры, устранение замятия, повторная блокировка «нужен техник»","give":"Аппарат, точка, код ошибки, что уже сделано на месте"}],"second":[{"id":"tilsi","name":"Интегратор-Тилси","sub":"второй уровень","from":"ksh","what":"Расследование невыдачи после оплаты и сбоев связи хаба с аппаратом"}],"incidents":[["И-01","Аппарат недоступен","«health»: false дольше 2 мин, нет хартбита","Блокирующий","Проверить, нет ли обрыва связи у нескольких аппаратов. Позвонить в ТТ: есть ли питание, что на экране аппарата",{"tt":"p","ksh":"s","visit":"s"},"Аппарат на связи, /health «health»: true"],["И-02","Пицца не выдана, блокировка печи","oven_blocked, позиция «не выдан»","Блокирующий","Позвонить в ТТ: осмотреть печь и окно выдачи, извлечь пиццу, подтвердить «камера пуста», вернуть деньги покупателю",{"tt":"p","ksh":"s","visit":"s"},"Блокировка снята после подтверждения на месте, деньги возвращены"],["И-03","Плата не принимает задачи, «нужен техник»","board_no_ack с блокировкой","Блокирующий","Передать инцидент интегратору КШ для анализа дампа, назначить выезд",{"ksh":"p","visit":"p","tt":"s"},"Причина устранена, блокировка снята, аппарат в M-02"],["И-04","Блокировка платы не снялась","machine_blocked без machine_unblocked","Блокирующий","Позвонить в ТТ: сбросить ошибки в сервисном меню по инструкции",{"tt":"p","ksh":"s","visit":"s"},"machine_unblocked, аппарат в M-02"],["И-05","Ошибка механизма, замятие коробки","error_raised с кодом мотора или датчика","Блокирующий","По коду ошибки определить узел. Позвонить в ТТ: уточнить, как загружали коробки",{"visit":"p","tt":"s"},"Механизм исправен, блокировка снята"],["И-06","Температура камеры вне нормы","freezerTempC вне нормы, приостановка продаж","Блокирующий","Позвонить в ТТ: закрыты ли двери, состояние товара. Товар с нарушенным хранением утилизируется по правилам технолога",{"tt":"p","visit":"s"},"Температура в норме, продажи возобновлены"],["И-07","Позиция без итога","order_error с unconfirmed, order_expired","Неблокирующий","Позвонить в ТТ: проверить, выдана ли пицца. При невыдаче — возврат денег. Передать интегратору КШ",{"tt":"p","ksh":"p"},"Итог подтвержден, возврат выполнен, причина записана"],["И-08","Невыдача после оплаты (обращение покупателя)","Обращение ТТ или покупателя, нет события выдачи","Неблокирующий","Позвонить в ТТ: вернуть деньги через интерфейс администратора КСО. Передать интегратору КШ для расследования с Интегратором-Тилси",{"tt":"p","ksh":"p","tilpos":"s"},"Деньги возвращены, причина найдена"],["И-09","Проблема кассы","Сообщение ТТ: POS-терминал, фискальный регистратор, зависание, интерфейс, СБП","Блокирующий","Позвонить в СП Тилпос",{"tilpos":"p","tt":"s"},"КСО принимает оплату"],["И-10","КСО не видит аппарат","Платформа: «health»: true, продаж нет, ошибки хаба","Блокирующий","Передать интегратору КШ: проверить /health и сеть точки. Позвонить в ТТ: проверить сетевой кабель",{"ksh":"p","tt":"s","tilpos":"s"},"Хаб получает /health, продажи идут"],["И-11","Пицца не забрана из окна выдачи","Сообщение ТТ (события аппарата нет)","Неблокирующий","Позвонить в ТТ: извлечь пиццу",{"tt":"p"},"Окно выдачи свободно"],["И-12","Нет товара","Все ячейки пусты","Неблокирующий","Позвонить в ТТ: пополнить и отметить ячейки",{"tt":"p"},"Остаток больше нуля в /v1/channels"],["И-13","Частые перезапуски приложения","Короткие «health»: false, перезапуски, error_raised CrashGuard","Неблокирующий","Передать интегратору КШ",{"ksh":"p"},"Причина найдена, перезапуски прекратились"],["И-14","Сбой обновления агента","Версия агента не изменилась, ошибка OTA","Неблокирующий","Передать интегратору КШ",{"ksh":"p"},"Аппарат на новой версии, /health «health»: true"]],"closing":["Аппарат вернулся в M-02 и на платформе «health»: true, либо выезд назначен и записан в Яндекс Трекере.","Блокировка печи снята только после подтверждения человеком на месте, что камера пуста.","По каждой невыданной позиции деньги покупателю возвращены.","В инциденте записаны причина, действия и кто их выполнил.","Тех-бот опубликовал закрытие инцидента."],"note":"Сроки реакции и закрытия по типам инцидентов не определены и требуют утверждения.","rtk":{"name":"РТК «Робокафе»","dev":"РТК «Робокафе»","devSub":"события, телеметрия, звуковой вызов в зале","platSub":"диспетчеризация · регистрирует инцидент","intro":["РТК сначала вызывает сотрудника магазина звуковым сообщением в торговом зале. Если событие не устранено за 10 мин, а истекший срок выдачи — за 30 мин, инцидент уходит дежурному. Без связи с диспетчеризацией РТК повторяет звуковое сообщение каждые 15 мин.","Дальше процесс общий: платформа мониторинга регистрирует инцидент, дублирует его в Тех-бот и в Яндекс Трекер, дежурный выбирает направления эскалации и контролирует закрытие."],"steps":["РТК вызывает сотрудника магазина звуковым сообщением «Внимание, требуется помощь в кафетерии».","Если событие не устранено за 10 мин (истекший срок выдачи — за 30 мин), или произошел критический отказ, или РТК не на связи, платформа мониторинга регистрирует инцидент: РТК, точку, режим, тип, время и номер заказа.","Платформа дублирует инцидент в Тех-бот (группа Telegram или Max) и задачей в Яндекс Трекер руководителю сервиса.","Дежурный принимает инцидент и определяет его тип по матрице.","Дежурный эскалирует инцидент: СП Тилпос, инженер-интегратор КШ, сотрудник ТТ, выезд сервисного инженера. Удаленные команды выполняет только из белого списка (приложение Е.5 концепции РТК).","Дежурный записывает в инциденте действия, ответы получателей и причину.","Дежурный контролирует закрытие и закрывает инцидент. Тех-бот публикует закрытие."],"routeWhat":{"ksh":"Разбор журналов РТК и первопричины, удаленное восстановление подсистем по белому списку, обновление ПО и технологических карт. При причине на стороне хаба привлекает Интегратора-Тилси","tt":"Уточнение обстоятельств и дополнительные инструкции: уборка упавших предметов и проливов, утилизация брака, извлечение невостребованных заказов, ручное завершение позиции, пуск после остановки на месте, ежедневное обслуживание","visit":"Внеплановое ТО после критического отказа, ручной возврат манипулятора на траекторию, ремонт сборки, снятие отметки «Критический отказ». Прибытие не позднее 4 ч после уведомления"},"incidents":[["РИ-01","РТК не на связи","Нет телеметрии, статус «Нет связи»","Неблокирующий","Позвонить в ТТ: работает ли РТК, что на сервисной панели. Без связи РТК продолжает продавать и сам повторяет звуковой вызов",{"tt":"p","ksh":"s","visit":"s"},"Связь восстановлена, журнал за время без связи передан"],["РИ-02","Столкновение манипулятора","Переход в M-06 по столкновению","Блокирующий","Позвонить в ТТ: осмотреть зону, при необходимости убрать (M-04.2), выполнить пуск на месте",{"tt":"p","ksh":"s"},"РТК в M-03, прием открыт"],["РИ-03","Критический отказ","Отметка «Критический отказ», M-05.2, отказ из перечня или повторное столкновение","Блокирующий","Назначить выезд. Не выставленные в ячейки позиции РТК отменил, возврат выполняет Контур. Передать интегратору КШ для разбора",{"visit":"p","ksh":"s","tt":"s"},"Инженер устранил отказ, снял отметку, провел тестовый цикл, РТК в M-03"],["РИ-04","Аварийный останов или открытие двери","Переход в M-06 по функции безопасности","Блокирующий","Позвонить в ТТ: выяснить причину, убрать, выполнить сброс и пуск на месте. Если отклонение от траектории больше Δ — назначить выезд",{"tt":"p","visit":"s"},"РТК в M-03"],["РИ-05","Требуется вмешательство персонала","П2 = «Ожидание вмешательства»: упавший предмет, пролив, затор диспенсера","Блокирующий","Позвонить в ТТ: войти по запросу входа (M-04.2), устранить, выполнить пуск",{"tt":"p"},"Зона убрана, РТК в M-03"],["РИ-06","Протечка воды","Датчик протечки, критический отказ, M-05.2","Блокирующий","Позвонить в ТТ: убрать воду снаружи и в рабочей зоне. Назначить выезд",{"tt":"p","visit":"p"},"Протечка устранена, отметка снята, РТК в M-03"],["РИ-07","Брак, исчерпаны попытки","Брак в ячейке, позиция отменена после 3 попыток","Неблокирующий","Позвонить в ТТ: утилизировать брак. При повторах — передать интегратору КШ",{"tt":"p","ksh":"s"},"Ячейка брака свободна, причина повторов найдена"],["РИ-08","Невостребованный заказ","Истек срок выдачи, ячейка не освобождена 30 мин","Неблокирующий","Позвонить в ТТ: извлечь заказ с сервисной панели",{"tt":"p"},"Ячейка свободна"],["РИ-09","Нет свободной ячейки","Причина П1 «Нет свободной ячейки»","Блокирующий","Позвонить в ТТ: освободить ячейки",{"tt":"p"},"Причина П1 снята"],["РИ-10","Отказ сборки, ограниченное меню","Отметка «Деградированный», позиции скрыты","Неблокирующий","Попробовать удаленное восстановление по белому списку. Если не помогло — назначить выезд",{"ksh":"p","visit":"s"},"Сборка исправна, позиции в меню"],["РИ-11","Запасы, сроки годности, температура хранения","Низкий запас, исключение позиций, нарушение температуры витрины","Неблокирующий","Позвонить в ТТ: пополнить, снять товар с нарушенным хранением. При нарушении температуры — назначить выезд",{"tt":"p","visit":"s"},"Меню и витрина соответствуют запасам и условиям хранения"],["РИ-12","Пропадание сети, разряд ИБП","Причина П1 «Нет сетевого питания», M-06 по заряду ИБП","Блокирующий","Позвонить в ТТ: есть ли сеть в магазине. После возврата сети — пуск на месте",{"tt":"p","visit":"s"},"РТК в M-03"],["РИ-13","Хаб недоступен","Причина П1 «Нет связи с хабом»","Блокирующий","Передать интегратору КШ. Позвонить в ТТ: запускать оплаченные заказы с сервисной панели",{"ksh":"p","tt":"s"},"Связь с хабом восстановлена, журнал заказов передан"],["РИ-14","Пожарный сигнал","M-06 по пожарному сигналу","Блокирующий","Позвонить в ТТ: после отбоя тревоги осмотреть зону, включить нагрев, выполнить пуск",{"tt":"p","visit":"s"},"РТК в M-03"],["РИ-15","Ежедневное обслуживание не выполнено","Через 30 мин после планового времени обслуживание не начато","Неблокирующий","Позвонить в ТТ. В конце смены удаленно выключить нагрев",{"tt":"p"},"Обслуживание выполнено, тракт молока промыт"],["РИ-16","Сбой подсистемы","Уведомление о сбое при П2 = «Ожидание» или «Восстановление»","Неблокирующий","Выполнить команду из белого списка: перезапуск, промывка, диагностика. Не помогло — поставить отметку «Критический отказ»",{"ksh":"p","visit":"s"},"Сбой устранен или назначен выезд"],["РИ-17","Проблема кассы","Сообщение ТТ: POS-терминал, фискальный регистратор, зависание, интерфейс, СБП","Блокирующий","Позвонить в СП Тилпос",{"tilpos":"p","tt":"s"},"КСО принимает оплату"]],"closing":["РТК вернулся в M-03 и прием открыт, либо выезд назначен и записан в Яндекс Трекере.","Отметку «Критический отказ» снял сервисный инженер на месте после тестового цикла.","Пуск после остановки выполнен человеком на месте по условию У-1.","По отмененным позициям Контур выполнил возврат денег.","В инциденте записаны причина, действия и кто их выполнил. Тех-бот опубликовал закрытие."]}},"stages":[["Этап","Содержание","Состояние на 03.11.2026"],["Пилот","IPS-0001 и IPS-0002, две точки (Красногорск, Подмосковный б-р 2; вторая точка по листу товаров — Липовой Рощи, 5)","Агент 2.2.25 на обоих, установлен 03.11. Защелка IPS-0002 снята 03.11 после проверки печи"],["Интеграция с КСО","Продажа через КСО и хаб по ICD-IPSM","КСО опрашивает /v1/channels, заказы через /v1/vend с 30.10 не поступали — нужен журнал КСО"],["Тиражирование","Новые точки с единой сборкой APK и сертификатами платформы","Не начато"]],"diffs":["На пилоте защелку снимает интегратор через туннель. В целевом решении — команда платформы с подтверждением на месте.","На пилоте брокер MQTT и туннель работают в Termux на аппарате. Вынос брокера на сторону хаба — решение архитектора.","На пилоте нет матрицы эскалации и регламента вызова сотрудника."],"questions":[["№","Вопрос","Кому"],["В-01","Работает ли аппарат вне часов точки. Нужен ли дежурный режим: охлаждение без продажи, хаб не шлет заказы","Бизнес"],["В-02","Разделить доступ персонала и инженера к сервисному меню, сменить заводской код","Владелец продукта, изготовитель"],["В-03","Что делать с незабранной пиццей: таймаут окна выдачи, сообщение покупателю, утилизация","Бизнес, изготовитель"],["В-04","Таймаут хаба на /v1/vend (сейчас 20 с при ответе до 30 с), обязательность client_order_id","Подрядчик хаба"],["В-05","Команда платформы для снятия защелки с полем «кто подтвердил на месте»","Интегратор, диспетчеризация"],["В-06","Порог отключения по температуре камеры, время восстановления, правило утилизации товара","Технолог, изготовитель"],["В-07","Классификация отказов и время прибытия инженера","Владелец продукта"],["В-08","Ставить ли защелку при неподтвержденной позиции и после пропадания сети во время готовки","Владелец продукта"],["В-09","Запрет или предупреждение при входе в сервисное меню во время готовки","Интегратор, изготовитель"],["В-10","Исполнение питания для точек: однофазное или трехфазное","Изготовитель, магазин"],["В-11","Замена аварийного останова: доступ сотрудника к автомату питания, оценка рисков","Владелец продукта"],["В-12","Синяя кнопка при пополнении («из режима кассы в режим вендинга») — что именно она переключает","Изготовитель"],["В-13","Категории учета времени и целевой коэффициент готовности","Владелец продукта"]],"docs":[["Обозначение","Документ"],["Д1","ICD-IPSM rev01. Интерфейсная спецификация аппарата IPlaySmart и хаба интеграции"],["Д2","ЧТЗ «Интеграция IPLAYSMART (пицца-автомат) и КСО», версия 1.1"],["Д3","Руководство по эксплуатации изготовителя, 5th Pizza Vending Machine"],["Д4","Инструкция «Как пополнять пиццемат», 11 шагов"],["Д5","Инструкция «Как покупать», 9 шагов"],["Д6","Акт приемки и осмотра № 1 от 30.07.2026"],["Д7","Контекст проекта IPLAYSMART (агент 2.2.25), PLATFORM_STATUS.md"],["Д8","РТК: Концепция эксплуатации — образец структуры"]],"abbr":[["Сокращение","Расшифровка"],["КСО","Касса самообслуживания Контура"],["Хаб","Хаб интеграции Контура"],["Агент","Шлюз интегратора внутри приложения аппарата"],["Защелка","Блокировка новой готовки после невыданной позиции (OvenGuard)"],["Readiness","Правило готовности аппарата к заказу"],["OTA","Удаленное обновление агента"],["MQTTS","MQTT поверх TLS с клиентским сертификатом"]]};
+/* Панель режимов пиццемата. M — модель из model/ips-model.js, вставляется при сборке */
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md = s => esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, cls, s){
+  const t = el('text', {x, y, class: cls}, parent);
+  t.textContent = s;
+  return t;
+}
+
+const MODES = Object.fromEntries(M.modes.map(m => [m.id, m]));
+const par = id => id.indexOf('.') > 0 ? id.slice(0, id.indexOf('.')) : null;
+const rel = (list, id) => list.some(x => x === '*' || x === id || x === par(id) || par(x) === id);
+const tid = n => 'T-' + String(n).padStart(2, '0');
+const TM = Object.fromEntries(M.trans.map(t => [t.n, t]));
+const label = t => t.fromL + ' → ' + t.toL;
+const KIND = {human:'действие человека на месте', auto:'автоматически', remote:'автоматически или удаленно', lock:'блокировка продаж'};
+
+/* Геометрия схемы, единицы viewBox 1300 x 800 */
+const COMPS = [
+  {id:'M-03', x:40, y:230, w:420, h:300, tx:60, ty:516},
+  {id:'M-05', x:800, y:230, w:420, h:300, tx:820, ty:516},
+  {id:'M-04', x:40, y:610, w:1180, h:170, tx:60, ty:766}
+];
+const NODES = [
+  {id:'OFF', x:40, y:50, w:190, h:70},
+  {id:'M-01', x:330, y:50, w:220, h:70},
+  {id:'M-02', x:660, y:50, w:280, h:70},
+  {id:'M-03.1', x:80, y:270, w:340, h:70},
+  {id:'M-03.2', x:80, y:400, w:340, h:70},
+  {id:'M-05.1', x:840, y:270, w:340, h:70},
+  {id:'M-05.2', x:840, y:400, w:340, h:70},
+  {id:'M-04.1', x:90, y:650, w:300, h:70},
+  {id:'M-04.2', x:480, y:650, w:300, h:70},
+  {id:'M-04.3', x:870, y:650, w:300, h:70}
+];
+const PSEUDO = [{t:18, x:40, y:150, w:190, h:30, label:'Из любого режима'}];
+/* p — ломаные, b — центры номеров, na — номера ломаных без стрелки (примыкание к другой линии) */
+const EDGES = [
+  {t:18, p:[[[135,150],[135,120]]], b:[]},
+  {t:1, p:[[[230,85],[330,85]]], b:[[280,85]]},
+  {t:2, p:[[[550,72],[660,72]]], b:[[605,72]]},
+  {t:4, p:[[[660,100],[550,100]], [[1150,230],[1150,150],[620,150],[620,100]]], b:[[605,100],[1060,150]], na:[1]},
+  {t:3, p:[[[500,120],[500,190],[1250,190],[1250,300],[1220,300]]], b:[[1110,190]]},
+  {t:14, p:[[[940,62],[1282,62],[1282,700],[1220,700]]], b:[[1282,420]]},
+  {t:12, p:[[[1180,435],[1205,435],[1205,85],[940,85]]], b:[[1205,260]]},
+  {t:5, p:[[[680,120],[680,295],[420,295]]], b:[[550,295]]},
+  {t:7, p:[[[710,120],[710,428],[420,428]]], b:[[560,428]]},
+  {t:11, p:[[[840,455],[420,455]]], b:[[625,455]]},
+  {t:6, p:[[[460,505],[750,505],[750,120]]], b:[[750,250]]},
+  {t:10, p:[[[780,120],[780,435],[840,435]]], b:[[780,350]]},
+  {t:8, p:[[[870,120],[870,270]]], b:[[870,222]]},
+  {t:9, p:[[[930,270],[930,120]]], b:[[930,222]]},
+  {t:13, p:[[[250,530],[250,610]], [[1010,530],[1010,610]]], b:[[250,570],[1010,570]]},
+  {t:15, p:[[[390,685],[480,685]], [[780,685],[870,685]]], b:[[435,685],[825,685]], both:true},
+  {t:16, p:[[[40,700],[12,700],[12,22],[760,22],[760,50]]], b:[[12,420]]},
+  {t:17, p:[[[40,740],[27,740],[27,38],[420,38],[420,50]]], b:[[27,560]]}
+];
+const NG = Object.fromEntries(NODES.map(n => [n.id, n]));
+const pathD = pts => 'M' + pts.map(p => p.join(',')).join(' L');
+
+/* Слои: [категория цвета, подпись на схеме] */
+const LAYERS = {
+  hub:{name:'Статус для хаба', cat:{
+    'OFF':['none','Нет связи'], 'M-01':['off','Нет связи, затем недоступен'], 'M-02':['ok','Доступен или 409 с причиной'],
+    'M-03.1':['off','Недоступен'], 'M-03.2':['off','Недоступен'], 'M-04.1':['off','Недоступен'], 'M-04.2':['off','Недоступен'], 'M-04.3':['off','Недоступен'],
+    'M-05.1':['off','Недоступен, machine_blocked'], 'M-05.2':['off','Недоступен, oven_blocked']},
+    legend:[['ok','Доступен'],['off','Недоступен: /health online:false или 409'],['none','Нет связи']],
+    info:'Хаб смотрит GET /health и хартбит iplaysmart/status. online:true — можно передавать заказ. Отказ в приеме приходит ответом 409 с причиной.'},
+  plat:{name:'Статус платформы', cat:{
+    'OFF':['none','online:false по Will'], 'M-01':['part','online после сессии MQTTS'], 'M-02':['ok','online:true'],
+    'M-03.1':['ok','online:true'], 'M-03.2':['ok','online:true'], 'M-04.1':['ok','online:true'], 'M-04.2':['ok','online:true'], 'M-04.3':['ok','online:true'],
+    'M-05.1':['part','online:true, событие блокировки'], 'M-05.2':['part','online:true, блокирующее событие']},
+    legend:[['ok','Сессия MQTTS жива'],['part','Сессия жива, есть блокировка или идет запуск'],['none','Нет сессии']],
+    info:'В RB Monitoring online означает живую сессию MQTTS, а не готовность к заказу. Поэтому в M-03 и M-04 аппарат на платформе зеленый, хотя заказы не принимает. Готовность — в слое «Статус для хаба».'},
+  time:{name:'Учет времени', cat:{
+    'OFF':['none','Организационный в часы работы'], 'M-01':['part','Как у режима входа'], 'M-02':['ok','Рабочее или по причинам П1'],
+    'M-03.1':['pause','Плановый простой'], 'M-03.2':['off','Внеплановый простой'], 'M-04.1':['pause','Плановый простой'], 'M-04.2':['off','Внеплановый простой'], 'M-04.3':['pause','Плановый простой'],
+    'M-05.1':['off','Внеплановый простой'], 'M-05.2':['off','Внеплановый простой']},
+    legend:[['ok','Рабочее время'],['pause','Плановый простой'],['off','Внеплановый простой'],['none','Организационный или не учитывается'],['part','По режиму входа']],
+    info:'Категории предложены по образцу РТК и требуют утверждения (В-13). При нескольких причинах время учитывается по старшей категории.'},
+  motion:{name:'Механика и нагрев', cat:{
+    'OFF':['none','Обесточены'], 'M-01':['part','Самопроверка, прогрев печи'], 'M-02':['ok','Автоматически по заказу'],
+    'M-03.1':['none','Опрос платы прерван'], 'M-03.2':['none','Опрос платы прерван'], 'M-04.1':['part','Тестовое окно'], 'M-04.2':['part','Тестовое окно'], 'M-04.3':['part','Тестовое окно'],
+    'M-05.1':['none','Готовка не начинается'], 'M-05.2':['off','Готовка запрещена до осмотра']},
+    legend:[['ok','Автоматически'],['part','Самопроверка или ручное управление'],['none','Не работают'],['off','Запрещены до осмотра человеком']],
+    info:'Кнопки аварийного останова нет: аппарат останавливают обесточиванием (T-18). Защелка печи запрещает новую готовку, пока человек не проверит камеру.'}
+};
+
+let layer = 'none', sel = null, scen = null;
+
+function buildSvg(){
+  const svg = $('#sm');
+  const defs = el('defs', {}, svg);
+  [['ah','mk-fg'],['ahd','mk-danger']].forEach(([id, cls]) => {
+    const m = el('marker', {id, viewBox:'0 0 10 10', refX:'9.5', refY:'5', markerWidth:9, markerHeight:9, markerUnits:'userSpaceOnUse', orient:'auto-start-reverse'}, defs);
+    el('path', {d:'M0,0 L10,5 L0,10 z', class: cls}, m);
+  });
+  COMPS.forEach(c => {
+    const g = el('g', {class:'node comp', 'data-s': c.id, tabindex:'0', role:'button', 'aria-label': c.id + ' ' + MODES[c.id].name}, svg);
+    el('rect', {x:c.x, y:c.y, width:c.w, height:c.h, rx:10}, g);
+    txt(g, c.tx, c.ty, 'ctitle', c.id + ' · ' + MODES[c.id].name);
+  });
+  const gt = el('g', {}, svg);
+  EDGES.forEach(e => {
+    const t = TM[e.t];
+    const g = el('g', {class:'tr ' + t.kind, 'data-t': e.t}, gt);
+    e.p.forEach((pts, i) => {
+      const d = pathD(pts);
+      el('path', {d, class:'halo'}, g);
+      el('path', {d, class:'hit'}, g);
+      const a = {d, class:'ln'};
+      if (!(e.na || []).includes(i)) a['marker-end'] = t.kind === 'lock' ? 'url(#ahd)' : 'url(#ah)';
+      if (e.both) a['marker-start'] = 'url(#ah)';
+      el('path', a, g);
+      if ((e.na || []).includes(i)){ const [x, y] = pts[pts.length - 1]; el('circle', {cx:x, cy:y, r:3, class:'junc'}, g); }
+    });
+    e.b.forEach(([x, y]) => {
+      const b = el('g', {class:'badge', 'data-t': e.t, tabindex:'0', role:'button', 'aria-label':'Переход ' + tid(t.n) + ': ' + label(t)}, g);
+      el('circle', {cx:x, cy:y, r:11}, b);
+      txt(b, x, y + 0.5, '', String(e.t));
+    });
+  });
+  NODES.forEach(n => {
+    const m = MODES[n.id];
+    const g = el('g', {class:'node atom' + (par(n.id) ? ' sub' : ''), 'data-s': n.id, tabindex:'0', role:'button', 'aria-label': (n.id === 'OFF' ? '' : n.id + ' ') + m.name}, svg);
+    el('rect', {x:n.x, y:n.y, width:n.w, height:n.h, rx:7}, g);
+    const cx = n.x + n.w / 2;
+    txt(g, cx, 0, 'nid', m.disp);
+    txt(g, cx, 0, 'nname', m.name);
+    txt(g, cx, 0, 'nstat', '');
+  });
+  PSEUDO.forEach(p => {
+    const g = el('g', {class:'pseudo', 'data-t': p.t, tabindex:'0', role:'button', 'aria-label': p.label + ', переход ' + tid(p.t)}, svg);
+    el('rect', {x:p.x, y:p.y, width:p.w, height:p.h, rx:p.h / 2}, g);
+    txt(g, p.x + p.w / 2, p.y + p.h / 2 + 4, '', p.label);
+  });
+}
+
+function paint(){
+  const svg = $('#sm');
+  svg.classList.toggle('l-none', layer === 'none');
+  svg.querySelectorAll('.node.atom').forEach(g => {
+    const n = NG[g.dataset.s], my = n.y + n.h / 2;
+    const r = g.querySelector('rect'), [tId, tName, tStat] = g.querySelectorAll('text');
+    if (layer === 'none'){
+      r.style.fill = ''; r.style.stroke = '';
+      tStat.textContent = '';
+      tId.setAttribute('y', my - 9); tName.setAttribute('y', my + 12);
+    } else {
+      const [c, l] = LAYERS[layer].cat[g.dataset.s];
+      r.style.fill = `var(--${c}-bg)`; r.style.stroke = `var(--${c})`;
+      tStat.textContent = l;
+      tId.setAttribute('y', my - 17); tName.setAttribute('y', my + 3); tStat.setAttribute('y', my + 21);
+    }
+  });
+  $('#legend').innerHTML = layer === 'none' ? '' : LAYERS[layer].legend.map(([c, l]) => `<span><i class="sw" style="background:var(--${c}-bg);border-color:var(--${c})"></i>${esc(l)}</span>`).join('');
+}
+
+/* Выделение: режим, переход, признак */
+function related(){
+  if (scen){
+    const [, hl] = M.scen[scen.i].steps[scen.k];
+    if (/^T-/.test(hl)) return {k:'t', n:+hl.slice(2)};
+    return {k:'s', id:hl};
+  }
+  return sel;
+}
+function apply(){
+  const svg = $('#sm');
+  const s = related();
+  svg.classList.toggle('has-sel', !!s);
+  svg.querySelectorAll('.on, .cur').forEach(x => x.classList.remove('on', 'cur'));
+  if (s){
+    const onT = new Set(), onS = new Set();
+    if (s.k === 's'){
+      onS.add(s.id);
+      M.trans.forEach(t => {
+        const out = t.from[0] !== '*' && rel(t.from, s.id), inn = rel(t.to, s.id);
+        if (out || inn){ onT.add(t.n); (out ? t.to : t.from).forEach(x => x !== '*' && onS.add(x)); }
+      });
+    } else if (s.k === 't'){
+      const t = TM[s.n];
+      onT.add(t.n);
+      [...t.from, ...t.to].forEach(x => x !== '*' && onS.add(x));
+    } else if (s.k === 'f'){
+      (M.flags.find(f => f.id === s.id).t || []).forEach(n => { onT.add(n); [...TM[n].from, ...TM[n].to].forEach(x => onS.add(x)); });
+    }
+    svg.querySelectorAll('.tr, .pseudo').forEach(g => { if (onT.has(+g.dataset.t)) g.classList.add('on'); });
+    svg.querySelectorAll('.node').forEach(g => {
+      const id = g.dataset.s;
+      if ([...onS].some(x => x === id || par(x) === id || par(id) === x)) g.classList.add('on');
+      if (s.k === 's' && (id === s.id)) g.classList.add('cur');
+    });
+  }
+  renderCard();
+  document.querySelectorAll('#tm tbody tr, #tt tbody tr').forEach(r => r.classList.toggle('sel', !!sel && ((sel.k === 's' && r.dataset.s === sel.id) || (sel.k === 't' && +r.dataset.t === sel.n))));
+}
+
+const tItem = t => `<li><button type="button" class="tlink${t.kind === 'lock' ? ' safety' : ''}" data-goto-t="${t.n}"><span class="tn">${t.n}</span><span>${esc(label(t))}</span><small>${esc(t.cond === '—' ? t.who : t.cond)}</small></button></li>`;
+const tList = a => a.length ? '<ul>' + a.map(tItem).join('') + '</ul>' : '<div class="empty">Переходов нет</div>';
+const gotoS = k => `<button type="button" class="goto" data-goto-s="${k}"><code>${esc(MODES[k].disp)}</code>${esc(MODES[k].name)}</button>`;
+const gotoF = f => `<button type="button" class="goto" data-goto-f="${f.id}">${esc(f.name)}</button>`;
+const lgRow = (cls, text) => `<svg width="34" height="10" aria-hidden="true"><line class="${cls}" x1="1" y1="5" x2="33" y2="5"/></svg><span>${text}</span>`;
+const rcol = id => id === 'OFF' ? null : (par(id) === 'M-03' || id === 'M-03') ? 'M-03' : (par(id) === 'M-04' || id === 'M-04') ? 'M-04' : (M.rcols.includes(id) ? id : null);
+
+function cmdsHtml(id){
+  const col = rcol(id);
+  if (id === 'OFF') return '<p class="note">Связи нет, команды не поступают.</p>';
+  if (!col) return '<p class="note">Команды заданы отдельно для M-05.1 и M-05.2.</p>';
+  const ok = M.cmds.filter(c => c.cells[col]).map(c => {
+    const cell = c.cells[col];
+    const d = /^Да/.test(c.danger) ? ' <span class="dg">опасная</span>' : '';
+    return `<li>${esc(c.cmd)}${cell[1] ? ` <i>(${esc(cell[1])})</i>` : ''}${d}</li>`;
+  });
+  return `<h4>Удаленные и сервисные команды</h4>${ok.length ? `<ul class="rc">${ok.join('')}</ul>` : '<div class="empty">Нет</div>'}`;
+}
+
+function introHtml(){
+  return `<h3>Как читать схему</h3>
+    <ul>
+      <li>Блоки — режимы аппарата. Блоки внутри M-03, M-04 и M-05 — подрежимы.</li>
+      <li>Нажмите на режим, чтобы раскрыть его переходы, на номер — чтобы увидеть условие и действия.</li>
+      <li>Слой раскрашивает режимы по статусу для хаба, статусу платформы, учету времени или работе механики.</li>
+      <li>Сценарий проводит по схеме шаг за шагом.</li>
+    </ul>
+    <div class="lgline">${lgRow('', 'Действие человека на месте')}${lgRow('dash', 'Автоматически')}${lgRow('dot', 'Автоматически или удаленно')}${lgRow('danger', 'Блокировка продаж')}</div>
+    ${layer !== 'none' ? `<p class="note">${esc(LAYERS[layer].info)}</p>` : ''}
+    <h4>Признаки аппарата</h4><div class="chips">${M.flags.map(gotoF).join('')}</div>
+    <p class="note">Таблицы модели — в справочнике под схемой.</p>`;
+}
+
+const FL = [['accept','Прием заказов'],['motion','Механика и нагрев'],['person','Кто внутри'],['hub','Статус для хаба'],['plat','Платформа'],['time','Учет времени']];
+function modeHtml(id){
+  const m = MODES[id];
+  const outs = M.trans.filter(t => t.from[0] !== '*' && rel(t.from, id));
+  const ins = M.trans.filter(t => rel(t.to, id));
+  const subs = M.modes.filter(x => par(x.id) === id);
+  const kind = par(id) ? 'Подрежим ' + par(id) : (subs.length ? 'Режим с подрежимами' : 'Режим');
+  const attrs = id === 'M-02' ? `<div class="attrs">${M.attrs02.slice(1).map(r => `<div><b>${esc(r[0])}.</b> ${esc(r[1])}. ${esc(r[2])}</div>`).join('')}</div>` : '';
+  const kv = m.accept ? `<dl class="kv">${FL.map(([k, l]) => `<dt>${l}</dt><dd>${esc(m[k])}</dd>`).join('')}</dl>` : '';
+  const fl = id === 'M-05.2' ? `<div class="chips">${gotoF(M.flags[1])}</div>` : '';
+  return `<div class="crumb">${kind}</div>
+    <div class="d-head"><span class="d-id">${esc(m.disp)}</span><h3>${esc(m.name)}</h3></div>
+    <p>${esc(m.purpose)}</p>
+    ${subs.length ? `<div class="chips">${subs.map(x => gotoS(x.id)).join('')}</div>` : ''}
+    ${attrs}${kv}${fl}
+    <div class="d-cols"><div><h4>Выход</h4>${tList(outs)}</div><div><h4>Вход</h4>${tList(ins)}</div></div>
+    ${subs.length ? '' : cmdsHtml(id)}`;
+}
+function transHtml(t){
+  const e = [...new Set([...t.from, ...t.to])].filter(x => MODES[x]);
+  return `<div class="crumb">Переход ${tid(t.n)} · ${KIND[t.kind]}</div>
+    <h3>${esc(label(t))}</h3>
+    <dl class="kv"><dt>Инициатор и канал</dt><dd>${esc(t.who)}</dd><dt>Условие</dt><dd>${esc(t.cond)}</dd><dt>Действия аппарата</dt><dd>${esc(t.act)}</dd></dl>
+    <div class="chips">${e.map(gotoS).join('')}</div>`;
+}
+function flagHtml(id){
+  const f = M.flags.find(x => x.id === id);
+  return `<div class="crumb">Признак аппарата</div><h3>${esc(f.name)}</h3>
+    <dl class="kv"><dt>Устанавливается</dt><dd>${esc(f.set)}</dd><dt>Снимается</dt><dd>${esc(f.clear)}</dd><dt>Действие</dt><dd>${esc(f.act)}</dd></dl>
+    ${f.t.length ? `<div class="d-cols"><div><h4>Связанные переходы</h4>${tList(f.t.map(n => TM[n]))}</div></div>` : ''}`;
+}
+function scenHtml(){
+  const s = M.scen[scen.i], [text, hl] = s.steps[scen.k], last = scen.k === s.steps.length - 1;
+  const where = /^T-/.test(hl) ? `<div class="chips"><button type="button" class="goto" data-goto-t="${hl.slice(2)}"><code>${tid(+hl.slice(2))}</code>${esc(label(TM[+hl.slice(2)]))}</button></div>` : `<div class="chips">${gotoS(hl)}</div>`;
+  return `<div class="crumb">${s.grp === 'norm' ? 'Штатный' : 'Нештатный'} сценарий ${s.id}</div>
+    <h3>${esc(s.name)}</h3>
+    ${scen.k === 0 ? `<p class="note"><b>Исходное состояние.</b> ${esc(s.start)}</p>` : ''}
+    <p><b>Шаг ${scen.k + 1}.</b> ${esc(text)}</p>${where}
+    ${last ? `<p><b>Результат.</b> ${esc(s.result)}</p>` : ''}
+    ${s.discuss && last ? `<p class="note"><b>Требует обсуждения.</b> ${esc(s.discuss)}</p>` : ''}
+    <div class="nav"><button type="button" data-act="prev" ${scen.k === 0 ? 'disabled' : ''}>Назад</button><button type="button" class="primary" data-act="${last ? 'end' : 'next'}">${last ? 'Завершить' : 'Далее'}</button><span class="step">${scen.k + 1} / ${s.steps.length}</span></div>`;
+}
+function renderCard(){
+  let h;
+  if (scen) h = scenHtml();
+  else if (!sel) h = introHtml();
+  else {
+    const back = '<button type="button" class="back" data-act="back">← К описанию схемы</button>';
+    h = back + (sel.k === 's' ? modeHtml(sel.id) : sel.k === 't' ? transHtml(TM[sel.n]) : flagHtml(sel.id));
+  }
+  $('#card').innerHTML = h;
+}
+function select(s){ scen = null; $('#scen').value = ''; sel = s; apply(); }
+
+/* Справочник */
+const table = (rows, opts = {}) => `<div class="tscroll"><table${opts.id ? ` id="${opts.id}"` : ''}${opts.cls ? ` class="${opts.cls}"` : ''}><thead><tr>${rows[0].map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${md(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+function buildSections(){
+  const leaf = M.modes.filter(m => m.accept);
+  const modesT = `<div class="tscroll"><table id="tm" class="wide"><thead><tr><th>Режим</th><th>Назначение</th>${FL.map(([, l]) => `<th>${l}</th>`).join('')}</tr></thead><tbody>${M.modes.map(m => `<tr data-s="${m.id}" tabindex="0" class="${par(m.id) ? 'sub' : (m.accept ? '' : 'parent')}"><td class="id">${esc(m.disp)}</td><td><b>${esc(m.name)}.</b> ${esc(m.purpose)}</td>${FL.map(([k]) => `<td>${esc(m[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const transT = `<div class="tscroll"><table id="tt" class="wide"><thead><tr><th>№</th><th>Переход</th><th>Инициатор и канал</th><th>Условие</th><th>Действия аппарата</th></tr></thead><tbody>${M.trans.map(t => `<tr data-t="${t.n}" tabindex="0"><td class="id">${tid(t.n)}</td><td class="path">${esc(label(t))}</td><td>${esc(t.who)}</td><td>${esc(t.cond)}</td><td>${esc(t.act)}</td></tr>`).join('')}</tbody></table></div>`;
+  const cell = c => !c ? '<span class="cell c-n">—</span>' : c[0] === 'y' ? '<span class="cell c-y">да</span>' : `<span class="cell c-c">с условием<small>${esc(c[1])}</small></span>`;
+  const matrix = `<div class="tscroll"><table class="matrix"><thead><tr><th>Команда</th><th>Опасная</th>${M.rcols.map(c => `<th class="m">${c}<small>${esc(MODES[c] ? MODES[c].name : '')}</small></th>`).join('')}</tr></thead><tbody>${M.cmds.map(c => `<tr><td class="cmd">${esc(c.cmd)}<small>${esc(c.ch)}</small><span>${esc(c.note)}</span></td><td class="dz">${esc(c.danger)}</td>${M.rcols.map(k => `<td class="c">${cell(c.cells[k])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const ul = xs => `<ul class="plain">${xs.map(x => `<li>${md(x)}</li>`).join('')}</ul>`;
+  const TABS = [
+    ['Принципы', `<div class="card">${ul(M.principles)}</div><div class="rsec"><h3>Признаки аппарата</h3>${table([['Признак','Устанавливается','Снимается','Действие']].concat(M.flags.map(f => [f.name, f.set, f.clear, f.act])))}</div><div class="rsec"><h3>Признаки режима M-02</h3>${table(M.attrs02)}</div>`],
+    ['Режимы', modesT],
+    ['Переходы', transT],
+    ['Причины отказа', table(M.reasons, {cls:'wide'}) + `<p class="note">${esc(M.reasonsNote)}</p>`],
+    ['Отказы', `<div class="card"><p>${esc(M.failures.intro)}</p>${ul(M.failures.items)}<p class="note">${esc(M.failures.note)}</p></div>`],
+    ['Команды', `<div class="card">${ul(M.cmdsNote)}</div>${matrix}`],
+    ['Заказ', `<div class="rsec"><h3>Состояния позиции</h3>${table(M.orderStates)}</div><div class="rsec"><h3>Переходы</h3>${table(M.orderTrans)}</div><div class="card">${ul(M.orderNotes)}</div>`],
+    ['Параметры', table(M.params)],
+    ['Решения', table(M.decisions)],
+    ['Риски', table(M.risks)],
+    ['Вопросы', table(M.questions)]
+  ];
+  $('#tabs').innerHTML = TABS.map(([n], i) => `<button type="button" role="tab" data-tab="tp${i}" aria-selected="${i === 0}">${n}</button>`).join('');
+  $('#tabps').innerHTML = TABS.map(([, h], i) => `<div class="tabp" role="tabpanel" id="tp${i}" ${i ? 'hidden' : ''}>${h}</div>`).join('');
+}
+
+/* Запуск и события. #scheme — только схема, для картинки в документе */
+if (location.hash === '#scheme'){ document.documentElement.dataset.theme = 'light'; document.body.classList.add('scheme-only'); }
+M.scen.forEach((s, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = `${s.id} ${s.name}`; $('#scen').appendChild(o); });
+buildSvg();
+buildSections();
+paint();
+apply();
+
+function pick(target){
+  const t = target.closest('[data-t]'), s = target.closest('[data-s]');
+  if (t) { select({k:'t', n:+t.dataset.t}); return true; }
+  if (s) { select({k:'s', id:s.dataset.s}); return true; }
+  return false;
+}
+$('#sm').addEventListener('click', ev => { if (!pick(ev.target) && (sel || scen)){ scen = null; sel = null; $('#scen').value = ''; apply(); } });
+$('#sm').addEventListener('keydown', ev => {
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  if (ev.target.closest('.badge, .pseudo, .node')){ ev.preventDefault(); pick(ev.target); }
+});
+$('#card').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-act]');
+  if (b){
+    const a = b.dataset.act;
+    if (a === 'prev') scen.k--;
+    else if (a === 'next') scen.k++;
+    else { scen = null; sel = null; $('#scen').value = ''; }
+    apply();
+    return;
+  }
+  const t = ev.target.closest('[data-goto-t]'), s = ev.target.closest('[data-goto-s]'), f = ev.target.closest('[data-goto-f]');
+  if (t) select({k:'t', n:+t.dataset.gotoT});
+  else if (s) select({k:'s', id:s.dataset.gotoS});
+  else if (f) select({k:'f', id:f.dataset.gotoF});
+});
+$('#layer').addEventListener('change', e => { layer = e.target.value; paint(); apply(); });
+$('#scen').addEventListener('change', e => { sel = null; scen = e.target.value === '' ? null : {i:+e.target.value, k:0}; apply(); });
+$('#tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('[role="tab"]');
+  if (!b) return;
+  document.querySelectorAll('#tabs [role="tab"]').forEach(x => { const on = x === b; x.setAttribute('aria-selected', String(on)); $('#' + x.dataset.tab).hidden = !on; });
+});
+function rowPick(ev){
+  if (ev.type === 'keydown' && ev.key !== 'Enter' && ev.key !== ' ') return;
+  const r = ev.target.closest('tr[data-s], tr[data-t]');
+  if (!r) return;
+  if (ev.type === 'keydown') ev.preventDefault();
+  select(r.dataset.s ? {k:'s', id:r.dataset.s} : {k:'t', n:+r.dataset.t});
+  $('#fig').scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.addEventListener('click', ev => { if (ev.target.closest('#tm, #tt')) rowPick(ev); });
+document.addEventListener('keydown', ev => {
+  if (ev.target.closest && ev.target.closest('#tm, #tt')) rowPick(ev);
+  if (ev.key === 'Escape' && (sel || scen)){ sel = null; scen = null; $('#scen').value = ''; apply(); }
+});
+
+</script>
+</body>
+</html>

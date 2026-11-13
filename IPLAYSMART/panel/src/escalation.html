@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Эскалация инцидентов IPLAYSMART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>/*CSS*/</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IPLAYSMART · Концепция эксплуатации · приложение Д, черновик</div>
+    <h1>Матрица эскалации инцидентов</h1>
+    <p class="lead">Выберите тип инцидента, чтобы увидеть, куда дежурный его эскалирует, или пройдите порядок обработки по шагам. Нажмите на блок схемы, чтобы узнать, что решает получатель.</p>
+    <nav class="pnav"><a href="index.html">Режимы работы</a><span aria-current="page">Эскалация</span></nav>
+  </header>
+
+  <div class="controls">
+    <label class="ctl" for="inc">Инцидент
+      <select id="inc"><option value="">Не выбран</option></select>
+    </label>
+    <button type="button" class="reset" id="steps">Порядок обработки по шагам</button>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="main">
+    <figure class="diagram" id="fig">
+      <div class="scroll">
+        <svg id="es" viewBox="0 0 1200 650" role="group" aria-label="Схема эскалации: аппарат, платформа, Тех-бот, руководитель сервиса, дежурный и направления эскалации"></svg>
+      </div>
+    </figure>
+    <aside class="side" id="card" aria-live="polite"></aside>
+  </div>
+
+  <details class="refblock" id="ref" open>
+    <summary>Справочник<span>порядок обработки, направления, матрица, закрытие</span></summary>
+    <div class="tabs" role="tablist" aria-label="Разделы справочника" id="tabs"></div>
+    <div id="tabps"></div>
+  </details>
+
+  <footer>Панель построена из той же модели, что и приложение Д документа «IPS_ Концепция эксплуатации» (model/ips-model.js, раздел M.esc). Сроки реакции и закрытия не определены и требуют утверждения.</footer>
+</div>
+<script>
+const E = /*ESC*/;
+/*JS*/
+</script>
+</body>
+</html>

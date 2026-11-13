@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Эскалация инцидентов IPLAYSMART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>/* Схема-лист: шапка с навигацией, панель управления, диаграмма во всю ширину, карточка выделения, справочные разделы */
+:root{
+  --bg:#f3f4f6; --surface:#ffffff; --fg:#171b21; --muted:#596271; --line:#cdd3dc; --comp:#eceff3; --sel:#e6eaf0;
+  --ok:#2e8049; --ok-bg:#e1f1e6;
+  --part:#a86e14; --part-bg:#f8edd4;
+  --pause:#3a66b8; --pause-bg:#e3ebfa;
+  --off:#b0413f; --off-bg:#f6e2e1;
+  --none:#768090; --none-bg:#e7eaee;
+  --danger:#c2362f;
+  --font-body:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111317; --surface:#191c21; --fg:#e6e9ed; --muted:#9aa3af; --line:#343a44; --comp:#15181c; --sel:#232830;
+    --ok:#5fbf80; --ok-bg:#15291c; --part:#e0a64a; --part-bg:#32260e; --pause:#80a7ee; --pause-bg:#172239;
+    --off:#e2797a; --off-bg:#361b1c; --none:#9aa3b0; --none-bg:#22262d; --danger:#ef6b63;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111317; --surface:#191c21; --fg:#e6e9ed; --muted:#9aa3af; --line:#343a44; --comp:#15181c; --sel:#232830;
+  --ok:#5fbf80; --ok-bg:#15291c; --part:#e0a64a; --part-bg:#32260e; --pause:#80a7ee; --pause-bg:#172239;
+  --off:#e2797a; --off-bg:#361b1c; --none:#9aa3b0; --none-bg:#22262d; --danger:#ef6b63;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1300px;margin:0 auto;padding-inline:20px;padding-block:32px 56px;display:grid;gap:20px}
+.eyebrow{font:500 12px/1.4 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(26px,3.4vw,36px);line-height:1.15;font-weight:700;letter-spacing:-.01em;margin:6px 0 10px;text-wrap:balance}
+.lead{max-width:72ch;margin:0;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font:500 13px var(--font-mono)}
+.toc{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:16px}
+.toc a{font:500 13px var(--font-body);color:var(--fg);text-decoration:none;padding:5px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.toc a:hover{background:var(--sel)}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;scroll-margin-top:16px}
+.group{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-width:0}
+.glabel,.d-cols h4,.kv dt,th{font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface)}
+.seg button{font:500 13.5px var(--font-body);padding:6px 12px;border:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.seg button:focus-visible,.reset:focus-visible,.tlink:focus-visible,.goto:focus-visible,.toc a:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sw{width:12px;height:12px;border-radius:3px;border:1.5px solid;display:inline-block}
+.lg line{stroke:var(--fg);stroke-width:1.6}
+.lg .dash{stroke-dasharray:6 4}
+.lg .dot{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+.lg .danger{stroke:var(--danger);stroke-dasharray:6 4}
+.reset{font:500 13px var(--font-body);padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);cursor:pointer}
+
+figure.diagram{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.scroll{overflow-x:auto}
+#sm{display:block;width:100%;min-width:980px;height:auto;color:var(--fg)}
+figcaption{padding:10px 16px 14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+#sm text{font-family:var(--font-body)}
+#sm .node rect{stroke-width:1.6}
+#sm .nid{font:500 11px var(--font-mono);fill:var(--muted);text-anchor:middle}
+#sm .nname{font-size:13.5px;font-weight:600;fill:var(--fg);text-anchor:middle}
+#sm .nstat{font-size:11px;font-weight:500;fill:var(--muted);text-anchor:middle}
+#sm .atitle{font-size:11.5px;font-weight:600;fill:var(--fg)}
+#sm .aval{font-size:11px;fill:var(--muted)}
+#sm .divl{stroke:var(--line);stroke-width:1}
+#sm .comp rect{fill:var(--comp);stroke:var(--line);stroke-width:1.3}
+#sm .ctitle{font-size:12.5px;font-weight:600;fill:var(--muted)}
+#sm .grp{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}
+#sm .pseudo rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3}
+#sm .pseudo text{font-size:12px;fill:var(--muted);text-anchor:middle}
+#sm .tr path{fill:none;stroke-linejoin:round}
+#sm .tr path.halo{stroke:var(--surface);stroke-width:5}
+#sm .tr path.ln{stroke:var(--fg);stroke-width:1.5}
+#sm .tr.auto path.ln,#sm .tr.safety path.ln{stroke-dasharray:6 4}
+#sm .tr.remote path.ln{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+#sm .tr.safety path.ln{stroke:var(--danger)}
+#sm .tr path.hit{stroke:transparent;stroke-width:14}
+#sm .junc{fill:var(--fg)}
+#sm .badge circle{fill:var(--surface);stroke:var(--fg);stroke-width:1.3}
+#sm .tr.safety .badge circle{stroke:var(--danger)}
+#sm .badge text{font:600 10.5px var(--font-mono);fill:var(--fg);text-anchor:middle;dominant-baseline:central}
+#sm .mk-fg{fill:var(--fg)}
+#sm .mk-danger{fill:var(--danger)}
+#sm .node,#sm .badge,#sm .pseudo,#sm .tr{cursor:pointer}
+#sm .node:focus,#sm .badge:focus,#sm .pseudo:focus{outline:none}
+#sm .node:focus-visible rect{stroke-width:3.2}
+#sm .badge:focus-visible circle{stroke-width:2.8}
+#sm .node,#sm .tr,#sm .pseudo,#sm .grp{transition:opacity .15s}
+#sm.has-sel .node:not(.on),#sm.has-sel .tr:not(.on),#sm.has-sel .pseudo:not(.on){opacity:.15}
+#sm.has-sel .comp:not(.on){opacity:.5}
+#sm .tr.on path.ln{stroke-width:2.6}
+#sm .tr.on .badge circle{stroke-width:2.2}
+#sm .node.cur rect{stroke-width:3.2}
+
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:14px;min-width:0}
+.detail .hint{margin:0;color:var(--muted)}
+.d-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.d-id{font:600 13px var(--font-mono);color:var(--muted)}
+.d-head h3{margin:0;font-size:20px;line-height:1.25;font-weight:700;text-wrap:balance}
+.d-desc{margin:0;max-width:75ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:var(--bg);max-width:100%}
+.chip b{font-weight:500;color:var(--muted);white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:7px}
+.st i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.d-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px 28px}
+.d-cols h4{margin:0 0 6px}
+.d-cols ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.tlink{display:grid;grid-template-columns:34px 1fr;gap:0 10px;width:100%;text-align:left;padding:6px 8px;border:0;border-radius:6px;background:transparent;color:var(--fg);font:inherit;cursor:pointer}
+.tlink:hover{background:var(--sel)}
+.tn{grid-row:span 2;font:600 11px var(--font-mono);display:inline-grid;place-items:center;width:28px;height:28px;border:1.3px solid var(--fg);border-radius:50%;align-self:start}
+.tlink.safety .tn{border-color:var(--danger)}
+.tlink span:not(.tn){font-size:14px;font-weight:500}
+.tlink small{font-size:13px;color:var(--muted)}
+.empty,.note{font-size:13.5px;color:var(--muted)}
+.note{margin:0;max-width:85ch}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 18px;margin:0}
+.kv dt{line-height:1.9}
+.kv dd{margin:0}
+.goto{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font:500 13px var(--font-body);cursor:pointer}
+.goto:hover{background:var(--sel)}
+.goto code{font:600 12px var(--font-mono);color:var(--muted)}
+.rc{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px}
+.rc i{font-style:normal;color:var(--muted)}
+
+.sec{display:grid;gap:10px;scroll-margin-top:16px;min-width:0}
+.sec h2{font-size:18px;font-weight:700;margin:8px 0 0}
+.sec h3{font-size:14.5px;font-weight:600;margin:6px 0 0}
+.sec p{margin:0;max-width:80ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 20px;display:grid;gap:10px;min-width:0}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 32px}
+.plain,.steps{margin:0;padding-left:20px;display:grid;gap:4px}
+.tscroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;min-width:820px;border-collapse:collapse;font-size:14px}
+table.wide{min-width:1120px}
+th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr[data-s],tbody tr[data-t]{cursor:pointer}
+tbody tr[data-s]:hover td,tbody tr[data-t]:hover td,tbody tr.sel td{background:var(--sel)}
+tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--fg)}
+tbody tr:focus-visible{outline:2px solid var(--fg);outline-offset:-2px}
+td.id{font:500 13px var(--font-mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.sub td.id{padding-left:28px;color:var(--muted)}
+tr.parent td:nth-child(2){font-weight:600}
+td.path{white-space:nowrap;font-weight:500}
+table.matrix{min-width:1080px}
+.matrix th.m{text-align:center;white-space:normal;min-width:96px}
+.matrix th.m small{display:block;font:400 11px var(--font-body);letter-spacing:0;text-transform:none;color:var(--muted)}
+.matrix td.c{text-align:center;vertical-align:middle;padding:6px}
+.cell{display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-width:62px;padding:4px 6px;border-radius:6px;font-size:12.5px;font-weight:600;line-height:1.25}
+.cell small{font-weight:400;font-size:11px;max-width:112px}
+.c-y{background:var(--ok-bg);color:var(--ok)}
+.c-c{background:var(--part-bg);color:var(--part)}
+.c-n{color:var(--muted);font-weight:500}
+.c-u{border:1px dashed var(--muted);color:var(--muted);font-weight:500}
+td.cmd{font-weight:600;min-width:200px}
+td.cmd small{display:block;font:500 11.5px var(--font-mono);color:var(--muted);margin-top:3px}
+td.cmd span{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+.mlegend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px;color:var(--muted)}
+footer{font-size:13px;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion: reduce){#sm .node,#sm .tr,#sm .pseudo,#sm .grp{transition:none}}
+:root{--shadow:0 10px 30px rgba(20,24,31,.16)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--shadow:0 10px 30px rgba(0,0,0,.55)}}
+:root[data-theme="dark"]{--shadow:0 10px 30px rgba(0,0,0,.55)}
+#tm{min-width:1340px}
+.ref{font:500 .9em var(--font-mono);color:inherit;background:none;border:0;border-bottom:1px dotted currentColor;padding:0;margin:0;cursor:pointer;line-height:inherit}
+.ref:hover{color:var(--pause)}
+.ref:focus-visible,.rc-x:focus-visible,#sm .fl:focus-visible rect{outline:2px solid var(--fg);outline-offset:2px}
+.refcard{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:10;max-width:640px;margin-inline:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;display:grid;gap:8px;max-height:55vh;overflow:auto}
+.rc-head{display:flex;align-items:baseline;gap:10px}
+.rc-head code{font:600 13px var(--font-mono)}
+.rc-head span{font-size:12.5px;color:var(--muted);flex:1;min-width:0}
+.rc-x{border:0;background:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}
+.refcard p{margin:0;font-size:14px}
+.rc-st{font-size:12.5px;color:var(--muted)}
+tr.x td{color:var(--muted)}
+tr.x td:not(:first-child){font-style:italic}
+.dchip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.d-ok{background:var(--ok-bg);color:var(--ok)}
+.d-none{background:var(--none-bg);color:var(--none)}
+.d-part{background:var(--part-bg);color:var(--part)}
+.d-pause{background:var(--pause-bg);color:var(--pause)}
+.steps li,.plain li{max-width:85ch}
+.detail ol{margin:0;padding-left:20px;display:grid;gap:3px}
+#sm .fbox{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+#sm .fl rect{fill:var(--bg);stroke:var(--muted);stroke-width:1}
+#sm .fl text{font-size:11.5px;fill:var(--fg)}
+#sm .fl{cursor:pointer;transition:opacity .15s}
+#sm .fl:focus{outline:none}
+#sm .fl.cur rect{stroke:var(--fg);stroke-width:2}
+#sm.has-sel .fl:not(.on){opacity:.35}
+@media (prefers-reduced-motion: reduce){#sm .fl{transition:none}}
+[hidden]{display:none!important}
+.wrap{max-width:1480px;gap:16px}
+header .lead{max-width:80ch}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.wrap > *{min-width:0}
+.ctl{display:inline-flex;align-items:center;gap:8px;max-width:100%;min-width:0;font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ctl select{min-width:0;flex:0 1 auto;font:500 14px var(--font-body);letter-spacing:0;text-transform:none;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:100%}
+.ctl select:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:12px;min-width:0;align-content:start}
+@media (min-width:1200px){
+  .main{grid-template-columns:minmax(0,1fr) 340px}
+  .side{position:sticky;top:calc(12px + env(safe-area-inset-top, 0px));max-height:calc(100vh - 24px);overflow:auto}
+}
+.side h3{margin:0;font-size:18px;line-height:1.25;font-weight:700;text-wrap:balance}
+.side p{margin:0}
+.side ul,.side ol{margin:0;padding-left:18px;display:grid;gap:5px}
+.side .kv{grid-template-columns:minmax(0,1fr);gap:2px 0}
+.side .kv dt{line-height:1.4;margin-top:8px}
+.side .kv dd{font-size:14px}
+.side .d-cols{grid-template-columns:minmax(0,1fr)}
+.crumb{font:500 12px var(--font-mono);color:var(--muted)}
+.back{justify-self:start;font:500 13px var(--font-body);padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+.nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nav button{font:500 13.5px var(--font-body);padding:7px 14px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+.nav button.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.nav button:disabled{opacity:.4;cursor:default}
+.nav .step{font:500 12px var(--font-mono);color:var(--muted);margin-left:auto}
+.back:focus-visible,.nav button:focus-visible,.tabs button:focus-visible,.refblock summary:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.attrs{display:grid;gap:6px;margin:0;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:13.5px}
+.attrs b{font-weight:600}
+.lgline{display:grid;grid-template-columns:34px 1fr;gap:6px 10px;align-items:center;font-size:13.5px;color:var(--muted)}
+.lgline svg line{stroke:var(--fg);stroke-width:1.6}
+.lgline .cyc{stroke-width:3}
+.lgline .thin{stroke:var(--muted);stroke-width:1.4}
+.lgline .dash{stroke-dasharray:6 4}
+.lgline .dot{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+.lgline .danger{stroke:var(--danger);stroke-dasharray:6 4}
+#legend:empty{display:none}
+
+#sm{min-width:900px}
+@media (min-width:1200px){#sm{min-width:0}}
+#sm .nid{font-size:12px}
+#sm .nname{font-size:15px}
+#sm .nstat{font-size:12px}
+#sm .ctitle{font-size:13.5px}
+#sm .badge text{font-size:11.5px}
+#sm.v-ov #g-dt{display:none}
+#sm.v-dt #g-ov{display:none}
+#sm:not(.l-safety) #g-flags{display:none}
+#sm.l-none .node.atom rect{fill:var(--surface);stroke:var(--fg);stroke-width:1.4}
+#sm.v-ov.l-none .node.sub rect{fill:transparent;stroke:var(--muted);stroke-dasharray:4 3;stroke-width:1.2}
+#sm.v-ov.l-none .node.sub text{fill:var(--muted)}
+#sm .ag path{fill:none;stroke-linejoin:round}
+#sm .ag path.halo{stroke:var(--surface);stroke-width:6}
+#sm .ag path.ln{stroke:var(--muted);stroke-width:1.4}
+#sm .ag.cycle path.ln{stroke:var(--fg);stroke-width:2.8}
+#sm .ag.safety path.ln{stroke:var(--danger);stroke-dasharray:6 4}
+#sm .ag.remote path.ln{stroke-dasharray:1.5 3.5;stroke-linecap:round;stroke-width:2}
+#sm .ag path.hit{stroke:transparent;stroke-width:16}
+#sm .ag{cursor:pointer;transition:opacity .15s}
+#sm .ag:focus{outline:none}
+#sm .ag:focus-visible path.ln{stroke-width:4}
+#sm .pill rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
+#sm .pill text{font:600 11.5px var(--font-mono);fill:var(--muted);text-anchor:middle;dominant-baseline:central}
+#sm .mk-muted{fill:var(--muted)}
+#sm.has-sel .ag:not(.on){opacity:.15}
+#sm .ag.on path.ln{stroke-width:3.2}
+#sm.has-sel .tr.trail{opacity:.5}
+#sm.has-sel .node.trail{opacity:.65}
+@media (prefers-reduced-motion: reduce){#sm .ag{transition:none}}
+
+.refblock{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 18px}
+.refblock summary{cursor:pointer;padding:14px 0;font-weight:700;font-size:16px}
+.refblock summary span{font-weight:400;font-size:13.5px;color:var(--muted);margin-left:8px}
+.refblock[open]{padding-bottom:18px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{font:500 13.5px var(--font-body);padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tabp{display:grid;gap:10px;min-width:0}
+.pillsample{justify-self:start;font:600 11.5px var(--font-mono);color:var(--muted);border:1.2px solid var(--muted);border-radius:10px;padding:0 7px;line-height:18px}
+.rsec{display:grid;gap:10px;min-width:0}
+.rsec + .rsec{margin-top:10px}
+.rsec h3{margin:4px 0 0;font-size:16px;font-weight:700}
+.card p{margin:0;max-width:85ch}
+.dg{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;font-size:11.5px;font-weight:600;line-height:18px;background:var(--off-bg);color:var(--off);white-space:nowrap}
+table.matrix{min-width:1220px}
+td.dz{font-size:13px;min-width:150px}
+.side h4{margin:6px 0 0;font:500 11.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+.side .chips{gap:6px}
+.pnav{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.pnav a,.pnav span{font:500 13px var(--font-body);padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--fg);text-decoration:none;background:var(--surface)}
+.pnav span{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.pnav a:hover{background:var(--sel)}
+
+#es{display:block;width:100%;min-width:900px;height:auto}
+@media (min-width:1200px){#es{min-width:0}}
+#es text{font-family:var(--font-body)}
+#es .bx rect{fill:var(--surface);stroke:var(--fg);stroke-width:1.4}
+#es .bx.src rect{fill:var(--comp);stroke:var(--line)}
+#es .bx.duty rect{stroke-width:2.4}
+#es .bx.second rect{stroke-dasharray:4 3;stroke:var(--muted)}
+#es .nname{font-size:15px;font-weight:600;fill:var(--fg);text-anchor:middle}
+#es .bx.duty .nname{font-size:16px}
+#es .nstat{font-size:12px;fill:var(--muted);text-anchor:middle}
+#es .lk path{fill:none;stroke-linejoin:round}
+#es .lk path.halo{stroke:var(--surface);stroke-width:6}
+#es .lk path.ln{stroke:var(--fg);stroke-width:1.5}
+#es .lk.dash path.ln,#es .lk.aux path.ln{stroke-dasharray:6 4}
+#es .lk.aux path.ln{stroke:var(--muted)}
+#es .lbl{font-size:12px;fill:var(--muted);text-anchor:middle}
+#es .lbl.start{text-anchor:start}
+#es .mk-fg{fill:var(--fg)} #es .mk-muted{fill:var(--muted)} #es .mk-p{fill:var(--pause)}
+#es .bx,#es .lk{transition:opacity .15s}
+#es .bx{cursor:pointer}
+#es .bx:focus{outline:none}
+#es .bx:focus-visible rect{stroke-width:3.2}
+#es.has-sel .bx:not(.on):not(.p):not(.s){opacity:.25}
+#es.has-sel .lk:not(.on):not(.p):not(.s){opacity:.12}
+#es .bx.cur rect{stroke-width:3.2}
+#es .bx.p rect{fill:var(--pause-bg);stroke:var(--pause);stroke-width:2.6}
+#es .bx.s rect{fill:var(--part-bg);stroke:var(--part);stroke-width:1.8;stroke-dasharray:6 4}
+#es .lk.p path.ln{stroke:var(--pause);stroke-width:3;stroke-dasharray:none}
+#es .lk.s path.ln{stroke:var(--part);stroke-width:2.2;stroke-dasharray:6 4}
+#es .lk.on path.ln{stroke-width:2.6}
+.dot{font-style:normal;font-weight:700;font-size:15px;line-height:1}
+.dot.p{color:var(--pause)} .dot.s{color:var(--part)}
+.legend .dot{margin-right:2px}
+.lgline .lp{stroke:var(--pause);stroke-width:3}
+.lgline .ls{stroke:var(--part);stroke-width:2.2;stroke-dasharray:6 4}
+#tmx{min-width:1240px}
+#tmx tbody tr{cursor:pointer}
+#tmx tbody tr:hover td,#tmx tbody tr.sel td{background:var(--sel)}
+#tmx td.c{text-align:center;vertical-align:middle}
+.rc .dot{margin-right:2px}
+@media (prefers-reduced-motion: reduce){#es .bx,#es .lk{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IPLAYSMART · Концепция эксплуатации · приложение Д, черновик</div>
+    <h1>Матрица эскалации инцидентов</h1>
+    <p class="lead">Выберите тип инцидента, чтобы увидеть, куда дежурный его эскалирует, или пройдите порядок обработки по шагам. Нажмите на блок схемы, чтобы узнать, что решает получатель.</p>
+    <nav class="pnav"><a href="index.html">Режимы работы</a><span aria-current="page">Эскалация</span></nav>
+  </header>
+
+  <div class="controls">
+    <label class="ctl" for="inc">Инцидент
+      <select id="inc"><option value="">Не выбран</option></select>
+    </label>
+    <button type="button" class="reset" id="steps">Порядок обработки по шагам</button>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="main">
+    <figure class="diagram" id="fig">
+      <div class="scroll">
+        <svg id="es" viewBox="0 0 1200 650" role="group" aria-label="Схема эскалации: аппарат, платформа, Тех-бот, руководитель сервиса, дежурный и направления эскалации"></svg>
+      </div>
+    </figure>
+    <aside class="side" id="card" aria-live="polite"></aside>
+  </div>
+
+  <details class="refblock" id="ref" open>
+    <summary>Справочник<span>порядок обработки, направления, матрица, закрытие</span></summary>
+    <div class="tabs" role="tablist" aria-label="Разделы справочника" id="tabs"></div>
+    <div id="tabps"></div>
+  </details>
+
+  <footer>Панель построена из той же модели, что и приложение Д документа «IPS_ Концепция эксплуатации» (model/ips-model.js, раздел M.esc). Сроки реакции и закрытия не определены и требуют утверждения.</footer>
+</div>
+<script>
+const E = {"intro":["Инциденты собираются в платформе мониторинга RB Monitoring и эскалируются диспетчеру-дежурному сервисному инженеру (далее — дежурный). Каждый инцидент дублируется в Тех-бот — группу в Telegram или Max — и задачей в Яндекс Трекер руководителю сервиса.","Дежурный определяет тип инцидента по матрице Д.3, выбирает одно или несколько направлений эскалации и контролирует закрытие инцидента."],"steps":["Аппарат публикует событие или перестает выходить на связь. Платформа мониторинга регистрирует инцидент: аппарат, точку, тип, время и номер заказа, если он есть. Пропадание связи регистрируется, если «health»: false держится дольше 2 мин.","Платформа дублирует инцидент в Тех-бот (группа Telegram или Max) и задачей в Яндекс Трекер руководителю сервиса.","Дежурный принимает инцидент и определяет его тип по матрице Д.3.","Дежурный эскалирует инцидент по одному или нескольким направлениям: СП Тилпос, инженер-интегратор КШ, сотрудник ТТ, выезд сервисного инженера.","Дежурный записывает в инциденте действия, ответы получателей и причину.","Дежурный контролирует закрытие по критериям Д.4 и закрывает инцидент. Тех-бот публикует закрытие."],"sources":[{"id":"dev","name":"Аппарат IPLAYSMART","sub":"события, температуры, «health»"},{"id":"plat","name":"Платформа мониторинга","sub":"RB Monitoring · регистрирует инцидент"},{"id":"bot","name":"Тех-бот","sub":"группа Telegram или Max"},{"id":"yt","name":"Руководитель сервиса","sub":"задача в Яндекс Трекере"},{"id":"duty","name":"Диспетчер-дежурный сервисный инженер","sub":"принимает решение, контролирует закрытие"},{"id":"close","name":"Закрытие инцидента","sub":"критерии Д.4"}],"routes":[{"id":"tilpos","name":"СП Тилпос","sub":"звонок","ch":"Звонок","what":"Проблемы касс: POS-терминал, фискальный регистратор, зависание, интерфейс КСО, СБП и другие платежи","give":"Точка, номер КСО, время, номер чека или заказа, что видит сотрудник"},{"id":"ksh","name":"Инженер-интегратор КШ","sub":"Тех-бот, звонок","ch":"Тех-бот, звонок","what":"Диагностика по журналам и дампам обмена с платой, анализ первопричины, снятие блокировки на пилоте, обновление агента. При причине на стороне хаба привлекает Интегратора-Тилси","give":"Аппарат, время, номер заказа, событие платформы"},{"id":"tt","name":"Сотрудник ТТ","sub":"звонок","ch":"Звонок","what":"Уточнение обстоятельств и дополнительные инструкции: осмотр печи и окна выдачи, извлечение пиццы, сброс ошибок, пополнение, возврат денег покупателю через интерфейс администратора КСО","give":"Что проверить и что сделать, кому сообщить результат"},{"id":"visit","name":"Сервисный инженер","sub":"выезд или назначение","ch":"Выезд дежурного или назначение через руководителя сервиса","what":"Ремонт механики, печи, холодильной камеры, устранение замятия, повторная блокировка «нужен техник»","give":"Аппарат, точка, код ошибки, что уже сделано на месте"}],"second":[{"id":"tilsi","name":"Интегратор-Тилси","sub":"второй уровень","from":"ksh","what":"Расследование невыдачи после оплаты и сбоев связи хаба с аппаратом"}],"incidents":[["И-01","Аппарат недоступен","«health»: false дольше 2 мин, нет хартбита","Блокирующий","Проверить, нет ли обрыва связи у нескольких аппаратов. Позвонить в ТТ: есть ли питание, что на экране аппарата",{"tt":"p","ksh":"s","visit":"s"},"Аппарат на связи, /health «health»: true"],["И-02","Пицца не выдана, блокировка печи","oven_blocked, позиция «не выдан»","Блокирующий","Позвонить в ТТ: осмотреть печь и окно выдачи, извлечь пиццу, подтвердить «камера пуста», вернуть деньги покупателю",{"tt":"p","ksh":"s","visit":"s"},"Блокировка снята после подтверждения на месте, деньги возвращены"],["И-03","Плата не принимает задачи, «нужен техник»","board_no_ack с блокировкой","Блокирующий","Передать инцидент интегратору КШ для анализа дампа, назначить выезд",{"ksh":"p","visit":"p","tt":"s"},"Причина устранена, блокировка снята, аппарат в M-02"],["И-04","Блокировка платы не снялась","machine_blocked без machine_unblocked","Блокирующий","Позвонить в ТТ: сбросить ошибки в сервисном меню по инструкции",{"tt":"p","ksh":"s","visit":"s"},"machine_unblocked, аппарат в M-02"],["И-05","Ошибка механизма, замятие коробки","error_raised с кодом мотора или датчика","Блокирующий","По коду ошибки определить узел. Позвонить в ТТ: уточнить, как загружали коробки",{"visit":"p","tt":"s"},"Механизм исправен, блокировка снята"],["И-06","Температура камеры вне нормы","freezerTempC вне нормы, приостановка продаж","Блокирующий","Позвонить в ТТ: закрыты ли двери, состояние товара. Товар с нарушенным хранением утилизируется по правилам технолога",{"tt":"p","visit":"s"},"Температура в норме, продажи возобновлены"],["И-07","Позиция без итога","order_error с unconfirmed, order_expired","Неблокирующий","Позвонить в ТТ: проверить, выдана ли пицца. При невыдаче — возврат денег. Передать интегратору КШ",{"tt":"p","ksh":"p"},"Итог подтвержден, возврат выполнен, причина записана"],["И-08","Невыдача после оплаты (обращение покупателя)","Обращение ТТ или покупателя, нет события выдачи","Неблокирующий","Позвонить в ТТ: вернуть деньги через интерфейс администратора КСО. Передать интегратору КШ для расследования с Интегратором-Тилси",{"tt":"p","ksh":"p","tilpos":"s"},"Деньги возвращены, причина найдена"],["И-09","Проблема кассы","Сообщение ТТ: POS-терминал, фискальный регистратор, зависание, интерфейс, СБП","Блокирующий","Позвонить в СП Тилпос",{"tilpos":"p","tt":"s"},"КСО принимает оплату"],["И-10","КСО не видит аппарат","Платформа: «health»: true, продаж нет, ошибки хаба","Блокирующий","Передать интегратору КШ: проверить /health и сеть точки. Позвонить в ТТ: проверить сетевой кабель",{"ksh":"p","tt":"s","tilpos":"s"},"Хаб получает /health, продажи идут"],["И-11","Пицца не забрана из окна выдачи","Сообщение ТТ (события аппарата нет)","Неблокирующий","Позвонить в ТТ: извлечь пиццу",{"tt":"p"},"Окно выдачи свободно"],["И-12","Нет товара","Все ячейки пусты","Неблокирующий","Позвонить в ТТ: пополнить и отметить ячейки",{"tt":"p"},"Остаток больше нуля в /v1/channels"],["И-13","Частые перезапуски приложения","Короткие «health»: false, перезапуски, error_raised CrashGuard","Неблокирующий","Передать интегратору КШ",{"ksh":"p"},"Причина найдена, перезапуски прекратились"],["И-14","Сбой обновления агента","Версия агента не изменилась, ошибка OTA","Неблокирующий","Передать интегратору КШ",{"ksh":"p"},"Аппарат на новой версии, /health «health»: true"]],"closing":["Аппарат вернулся в M-02 и на платформе «health»: true, либо выезд назначен и записан в Яндекс Трекере.","Блокировка печи снята только после подтверждения человеком на месте, что камера пуста.","По каждой невыданной позиции деньги покупателю возвращены.","В инциденте записаны причина, действия и кто их выполнил.","Тех-бот опубликовал закрытие инцидента."],"note":"Сроки реакции и закрытия по типам инцидентов не определены и требуют утверждения."};
+/* Панель эскалации. E — M.esc из model/ips-model.js, вставляется при сборке */
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(parent, x, y, cls, s){
+  const t = el('text', {x, y, class: cls}, parent);
+  t.textContent = s;
+  return t;
+}
+
+const NODE = Object.fromEntries([...E.sources, ...E.routes, ...E.second].map(n => [n.id, n]));
+const ROUTE_IDS = E.routes.map(r => r.id);
+const INC = E.incidents.map(([id, name, sign, kind, first, rt, close]) => ({id, name, sign, kind, first, rt, close}));
+const LEVEL = {p:'основное направление', s:'при необходимости'};
+
+/* Геометрия, единицы viewBox 1200 x 650 */
+const BOX = {
+  dev:{x:40, y:40, w:220, h:70}, plat:{x:330, y:40, w:260, h:70}, bot:{x:660, y:40, w:230, h:70}, yt:{x:950, y:40, w:220, h:70},
+  close:{x:40, y:210, w:240, h:80}, duty:{x:400, y:200, w:400, h:100},
+  tilpos:{x:40, y:400, w:240, h:80}, ksh:{x:330, y:400, w:240, h:80}, tt:{x:620, y:400, w:240, h:80}, visit:{x:910, y:400, w:260, h:80},
+  tilsi:{x:330, y:560, w:240, h:64}
+};
+/* Связи: from, to, ломаная, подпись [x, y, текст], вид: base — всегда, route — направление эскалации, aux — вспомогательная */
+const LINKS = [
+  {id:'dev-plat', p:[[260,75],[330,75]], kind:'base'},
+  {id:'plat-bot', p:[[590,75],[660,75]], kind:'base', lb:[625,64,'дубль']},
+  {id:'plat-yt', p:[[460,40],[460,16],[1060,16],[1060,40]], kind:'base', lb:[760,10,'задача']},
+  {id:'plat-duty', p:[[470,110],[470,200]], kind:'base', lb:[478,160,'инцидент', 'start']},
+  {id:'bot-duty', p:[[775,110],[775,200]], kind:'base dash', lb:[783,160,'уведомление', 'start']},
+  {id:'duty-close', p:[[400,250],[280,250]], kind:'base', lb:[340,240,'контролирует']},
+  {id:'r-tilpos', p:[[470,300],[160,400]], kind:'route', r:'tilpos', lb:[300,338,'звонок']},
+  {id:'r-ksh', p:[[560,300],[450,400]], kind:'route', r:'ksh'},
+  {id:'r-tt', p:[[640,300],[740,400]], kind:'route', r:'tt', lb:[700,338,'звонок']},
+  {id:'r-visit', p:[[730,300],[1000,400]], kind:'route', r:'visit', lb:[870,338,'выезд']},
+  {id:'yt-visit', p:[[1100,110],[1100,400]], kind:'aux', r:'visit', lb:[1108,250,'назначение', 'start']},
+  {id:'ksh-tilsi', p:[[450,480],[450,560]], kind:'aux', r:'tilsi', lb:[458,524,'причина в хабе', 'start']}
+];
+const STEP_HL = [['dev','plat'], ['plat','bot','yt'], ['duty'], ['duty', ...ROUTE_IDS], ['duty'], ['duty','close']];
+const STEP_LINKS = [['dev-plat'], ['plat-bot','plat-yt'], ['plat-duty','bot-duty'], ['r-tilpos','r-ksh','r-tt','r-visit'], [], ['duty-close']];
+
+let sel = null;   // {k:'inc', i} | {k:'node', id} | {k:'step', i}
+
+function buildSvg(){
+  const svg = $('#es');
+  const defs = el('defs', {}, svg);
+  [['ah','mk-fg'],['ahp','mk-p'],['ahm','mk-muted']].forEach(([id, cls]) => {
+    const m = el('marker', {id, viewBox:'0 0 10 10', refX:'9.5', refY:'5', markerWidth:9, markerHeight:9, markerUnits:'userSpaceOnUse', orient:'auto-start-reverse'}, defs);
+    el('path', {d:'M0,0 L10,5 L0,10 z', class: cls}, m);
+  });
+  const gl = el('g', {}, svg);
+  LINKS.forEach(l => {
+    const g = el('g', {class:'lk ' + l.kind, 'data-l': l.id}, gl);
+    if (l.r) g.dataset.r = l.r;
+    const d = 'M' + l.p.map(p => p.join(',')).join(' L');
+    el('path', {d, class:'halo'}, g);
+    el('path', {d, class:'ln', 'marker-end':'url(#ah)'}, g);
+    if (l.lb) txt(g, l.lb[0], l.lb[1], 'lbl' + (l.lb[3] ? ' ' + l.lb[3] : ''), l.lb[2]);
+  });
+  Object.entries(BOX).forEach(([id, b]) => {
+    const n = NODE[id];
+    const kind = ROUTE_IDS.includes(id) ? 'route' : id === 'tilsi' ? 'second' : id === 'duty' ? 'duty' : 'src';
+    const g = el('g', {class:'bx ' + kind, 'data-n': id, tabindex:'0', role:'button', 'aria-label': n.name}, svg);
+    el('rect', {x:b.x, y:b.y, width:b.w, height:b.h, rx:8}, g);
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+    txt(g, cx, cy - 4, 'nname', n.name);
+    txt(g, cx, cy + 16, 'nstat', n.sub || n.ch || '');
+  });
+}
+
+/* Подсветка: уровень направления для выбранного инцидента или набор узлов шага */
+function paint(){
+  const svg = $('#es');
+  svg.classList.toggle('has-sel', !!sel);
+  svg.querySelectorAll('.on, .p, .s, .cur').forEach(x => x.classList.remove('on', 'p', 's', 'cur'));
+  if (!sel) return renderCard();
+  let nodes = [], links = [];
+  if (sel.k === 'inc'){
+    const inc = INC[sel.i];
+    nodes = ['dev','plat','bot','yt','duty','close'];
+    links = LINKS.filter(l => l.kind.startsWith('base')).map(l => l.id);
+    Object.entries(inc.rt).forEach(([r, lv]) => {
+      svg.querySelector(`[data-n="${r}"]`).classList.add(lv);
+      svg.querySelectorAll(`.lk[data-r="${r}"]`).forEach(g => g.classList.add(lv));
+    });
+    if (inc.rt.ksh && /Тилси/.test(inc.first)){ svg.querySelector('[data-n="tilsi"]').classList.add('s'); svg.querySelector('[data-l="ksh-tilsi"]').classList.add('s'); }
+  } else if (sel.k === 'step'){
+    nodes = STEP_HL[sel.i]; links = STEP_LINKS[sel.i];
+  } else {
+    nodes = [sel.id];
+    links = LINKS.filter(l => l.id.split('-').includes(sel.id) || l.r === sel.id || l.id === 'r-' + sel.id).map(l => l.id);
+    links.forEach(id => { const l = LINKS.find(x => x.id === id); l.id.replace(/^r-/, 'duty-').split('-').forEach(n => nodes.push(n)); });
+    svg.querySelector(`[data-n="${sel.id}"]`).classList.add('cur');
+  }
+  nodes.forEach(n => { const g = svg.querySelector(`[data-n="${n}"]`); if (g) g.classList.add('on'); });
+  links.forEach(id => svg.querySelector(`[data-l="${id}"]`).classList.add('on'));
+  renderCard();
+  document.querySelectorAll('#tmx tbody tr').forEach(r => r.classList.toggle('sel', sel.k === 'inc' && +r.dataset.i === sel.i));
+}
+
+const dot = lv => lv ? `<span class="dot ${lv}" title="${LEVEL[lv]}">${lv === 'p' ? '●' : '○'}</span>` : '';
+const gotoN = id => `<button type="button" class="goto" data-goto-n="${id}">${esc(NODE[id].name)}</button>`;
+const gotoI = (i, pre = '') => `<li><button type="button" class="tlink" data-goto-i="${i}"><span class="tn">${INC[i].id.slice(2)}</span><span>${pre}${esc(INC[i].name)}</span><small>${esc(INC[i].sign)}</small></button></li>`;
+
+function introHtml(){
+  return `<h3>Как читать схему</h3>
+    <ul>
+      <li>Платформа регистрирует инцидент, дублирует его в Тех-бот и задачей в Яндекс Трекер руководителю сервиса.</li>
+      <li>Дежурный выбирает одно или несколько направлений эскалации и контролирует закрытие.</li>
+      <li>Выберите инцидент — схема покажет основные направления сплошной линией и направления «при необходимости» пунктиром.</li>
+    </ul>
+    <div class="lgline"><svg width="34" height="10" aria-hidden="true"><line class="lp" x1="1" y1="5" x2="33" y2="5"/></svg><span>Основное направление</span><svg width="34" height="10" aria-hidden="true"><line class="ls" x1="1" y1="5" x2="33" y2="5"/></svg><span>При необходимости</span></div>
+    <h4>Инциденты</h4><ul>${INC.map((_, i) => gotoI(i)).join('')}</ul>
+    <p class="note">${esc(E.note)}</p>`;
+}
+function incHtml(i){
+  const x = INC[i];
+  const rows = ROUTE_IDS.filter(r => x.rt[r]).sort((a, b) => (x.rt[a] > x.rt[b]) - (x.rt[a] < x.rt[b]))
+    .map(r => `<li>${dot(x.rt[r])} <b>${esc(NODE[r].name)}</b> — ${LEVEL[x.rt[r]]}. <i>${esc(NODE[r].ch)}</i></li>`).join('');
+  return `<div class="crumb">Инцидент ${esc(x.id)} · ${esc(x.kind.toLowerCase())}</div>
+    <h3>${esc(x.name)}</h3>
+    <dl class="kv"><dt>Признак в платформе</dt><dd>${esc(x.sign)}</dd><dt>Первое действие дежурного</dt><dd>${esc(x.first)}</dd></dl>
+    <h4>Эскалация</h4><ul class="rc">${rows}</ul>
+    <dl class="kv"><dt>Закрытие</dt><dd>${esc(x.close)}</dd></dl>
+    <div class="nav"><button type="button" data-act="iprev" ${i === 0 ? 'disabled' : ''}>Предыдущий</button><button type="button" class="primary" data-act="inext" ${i === INC.length - 1 ? 'disabled' : ''}>Следующий</button><span class="step">${i + 1} / ${INC.length}</span></div>`;
+}
+function nodeHtml(id){
+  const n = NODE[id];
+  const r = E.routes.find(x => x.id === id), s = E.second.find(x => x.id === id);
+  if (r){
+    const use = INC.map((x, i) => [x, i]).filter(([x]) => x.rt[id]);
+    return `<div class="crumb">Направление эскалации</div><h3>${esc(n.name)}</h3>
+      <dl class="kv"><dt>Канал</dt><dd>${esc(r.ch)}</dd><dt>Что решает</dt><dd>${esc(r.what)}</dd><dt>Что передает дежурный</dt><dd>${esc(r.give)}</dd></dl>
+      <h4>Инциденты</h4><ul>${use.map(([x, i]) => gotoI(i, dot(x.rt[id]) + ' ')).join('')}</ul>`;
+  }
+  if (s) return `<div class="crumb">Второй уровень · через ${esc(NODE[s.from].name)}</div><h3>${esc(n.name)}</h3><p>${esc(s.what)}</p><div class="chips">${gotoN(s.from)}</div>`;
+  if (id === 'close') return `<div class="crumb">Критерии Д.4</div><h3>${esc(n.name)}</h3><p>Дежурный закрывает инцидент, когда выполнены условия:</p><ul>${E.closing.map(c => `<li>${esc(c)}</li>`).join('')}</ul>`;
+  if (id === 'duty') return `<div class="crumb">Принимает решение</div><h3>${esc(n.name)}</h3><p>${esc(E.intro[1])}</p><div class="chips">${ROUTE_IDS.map(gotoN).join('')}</div>`;
+  return `<div class="crumb">Источник инцидента</div><h3>${esc(n.name)}</h3><p>${esc(n.sub)}</p><p class="note">${esc(E.intro[0])}</p>`;
+}
+function stepHtml(i){
+  const last = i === E.steps.length - 1;
+  return `<div class="crumb">Порядок обработки инцидента</div><h3>Шаг ${i + 1}</h3><p>${esc(E.steps[i])}</p>
+    <div class="nav"><button type="button" data-act="sprev" ${i === 0 ? 'disabled' : ''}>Назад</button><button type="button" class="primary" data-act="${last ? 'end' : 'snext'}">${last ? 'Завершить' : 'Далее'}</button><span class="step">${i + 1} / ${E.steps.length}</span></div>`;
+}
+function renderCard(){
+  const back = '<button type="button" class="back" data-act="end">← К описанию схемы</button>';
+  $('#card').innerHTML = !sel ? introHtml() : back + (sel.k === 'inc' ? incHtml(sel.i) : sel.k === 'step' ? stepHtml(sel.i) : nodeHtml(sel.id));
+}
+function select(s){
+  sel = s;
+  $('#inc').value = s && s.k === 'inc' ? String(s.i) : '';
+  paint();
+}
+
+function buildRef(){
+  const tbl = (head, rows, attrs = '') => `<div class="tscroll"><table ${attrs}><thead><tr>${head.map(h => `<th${h[1] ? ' class="m"' : ''}>${esc(h[0] || h)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+  const TABS = [
+    ['Порядок', `<div class="card"><p>${esc(E.intro[0])}</p><ol class="steps">${E.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol></div>`],
+    ['Направления', tbl(['Направление','Канал','Что решает','Что передает дежурный'],
+      [...E.routes.map(r => `<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.ch)}</td><td>${esc(r.what)}</td><td>${esc(r.give)}</td></tr>`),
+       ...E.second.map(s => `<tr><td><b>${esc(s.name)}</b></td><td>Через ${esc(NODE[s.from].name)}</td><td>${esc(s.what)}</td><td>—</td></tr>`)], 'class="wide"')],
+    ['Матрица', `<p class="note">● — основное направление, ○ — при необходимости. Нажмите на строку, чтобы показать инцидент на схеме.</p>` +
+      tbl([['№'],['Инцидент'],['Признак в платформе'],['Блокирует'],['Первое действие дежурного'], ...E.routes.map(r => [r.name, 1]), ['Закрытие']],
+        INC.map((x, i) => `<tr data-i="${i}" tabindex="0"><td class="id">${esc(x.id)}</td><td><b>${esc(x.name)}</b></td><td>${esc(x.sign)}</td><td>${x.kind === 'Блокирующий' ? 'да' : 'нет'}</td><td>${esc(x.first)}</td>${ROUTE_IDS.map(r => `<td class="c">${dot(x.rt[r])}</td>`).join('')}<td>${esc(x.close)}</td></tr>`), 'id="tmx" class="matrix"')],
+    ['Закрытие', `<div class="card"><p>Дежурный закрывает инцидент, когда выполнены условия:</p><ul class="plain">${E.closing.map(c => `<li>${esc(c)}</li>`).join('')}</ul><p class="note">${esc(E.note)}</p></div>`]
+  ];
+  $('#tabs').innerHTML = TABS.map(([n], i) => `<button type="button" role="tab" data-tab="tp${i}" aria-selected="${i === 2}">${n}</button>`).join('');
+  $('#tabps').innerHTML = TABS.map(([, h], i) => `<div class="tabp" role="tabpanel" id="tp${i}" ${i === 2 ? '' : 'hidden'}>${h}</div>`).join('');
+}
+
+INC.forEach((x, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = `${x.id} ${x.name}`; $('#inc').appendChild(o); });
+$('#legend').innerHTML = '<span><i class="dot p">●</i>основное направление</span><span><i class="dot s">○</i>при необходимости</span>';
+buildSvg();
+buildRef();
+paint();
+
+$('#es').addEventListener('click', ev => {
+  const n = ev.target.closest('[data-n]');
+  if (n) select({k:'node', id:n.dataset.n}); else if (sel) select(null);
+});
+$('#es').addEventListener('keydown', ev => {
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.closest('[data-n]')){ ev.preventDefault(); select({k:'node', id:ev.target.closest('[data-n]').dataset.n}); }
+});
+$('#inc').addEventListener('change', e => select(e.target.value === '' ? null : {k:'inc', i:+e.target.value}));
+$('#steps').addEventListener('click', () => select({k:'step', i:0}));
+$('#card').addEventListener('click', ev => {
+  const a = ev.target.closest('[data-act]');
+  if (a){
+    const act = a.dataset.act;
+    if (act === 'end') select(null);
+    else if (act === 'snext' || act === 'sprev') select({k:'step', i:sel.i + (act === 'snext' ? 1 : -1)});
+    else select({k:'inc', i:sel.i + (act === 'inext' ? 1 : -1)});
+    return;
+  }
+  const i = ev.target.closest('[data-goto-i]'), n = ev.target.closest('[data-goto-n]');
+  if (i) select({k:'inc', i:+i.dataset.gotoI});
+  else if (n) select({k:'node', id:n.dataset.gotoN});
+});
+$('#tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('[role="tab"]');
+  if (!b) return;
+  document.querySelectorAll('#tabs [role="tab"]').forEach(x => { const on = x === b; x.setAttribute('aria-selected', String(on)); $('#' + x.dataset.tab).hidden = !on; });
+});
+function rowPick(ev){
+  const r = ev.target.closest('#tmx tr[data-i]');
+  if (!r || (ev.type === 'keydown' && ev.key !== 'Enter' && ev.key !== ' ')) return;
+  ev.preventDefault();
+  select({k:'inc', i:+r.dataset.i});
+  $('#fig').scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.addEventListener('click', rowPick);
+document.addEventListener('keydown', ev => { rowPick(ev); if (ev.key === 'Escape' && sel) select(null); });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Режимы пиццемата IPLAYSMART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>/*CSS*/</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IPLAYSMART · Концепция эксплуатации · модель режимов, черновик</div>
+    <h1>Режимы работы пиццемата</h1>
+    <p class="lead">Модель для обсуждения. Нажмите на режим, чтобы раскрыть его переходы, на номер — чтобы увидеть условия перехода, или выберите сценарий и пройдите его по шагам.</p>
+    <nav class="pnav"><span aria-current="page">Режимы работы</span><a href="escalation.html">Эскалация</a></nav>
+  </header>
+
+  <div class="controls">
+    <label class="ctl" for="layer">Слой
+      <select id="layer">
+        <option value="none">Без слоя</option>
+        <option value="hub">Статус для хаба</option>
+        <option value="plat">Статус платформы</option>
+        <option value="time">Учет времени</option>
+        <option value="motion">Механика и нагрев</option>
+      </select>
+    </label>
+    <label class="ctl" for="scen">Сценарий
+      <select id="scen"><option value="">Не выбран</option></select>
+    </label>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="main">
+    <figure class="diagram" id="fig">
+      <div class="scroll">
+        <svg id="sm" viewBox="0 0 1300 800" role="group" aria-label="Схема режимов пиццемата: режимы, подрежимы и переходы"></svg>
+      </div>
+    </figure>
+    <aside class="side" id="card" aria-live="polite"></aside>
+  </div>
+
+  <details class="refblock" id="ref">
+    <summary>Справочник модели<span>принципы, режимы, переходы, причины отказа, отказы, команды, заказ, параметры, решения, вопросы</span></summary>
+    <div class="tabs" role="tablist" aria-label="Разделы справочника" id="tabs"></div>
+    <div id="tabps"></div>
+  </details>
+
+  <footer>Панель построена из той же модели, что и документ «IPS_ Концепция эксплуатации» (model/ips-model.js). Факты — по агенту 2.2.25, ЧТЗ v1.1, ICD-IPSM rev01 и документам изготовителя. Пометка «Требует обсуждения» означает предложение, не утвержденное владельцем продукта.</footer>
+</div>
+<script>
+const M = /*MODEL*/;
+/*JS*/
+</script>
+</body>
+</html>
